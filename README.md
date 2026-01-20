@@ -4,7 +4,7 @@ Group work carried out by the students: [Luca Arduini](https://github.com/LucaAr
 # 📡 ACN – BGP Network Automation Project
 
 <p align="center">
-  <img src="OtherFiles/networkTopologyDiagram.png" alt="Network Topology Diagram" width="350" />
+  <img src="OtherFiles/networkTopologyDiagram.png" alt="Network Topology Diagram" width="700" />
 </p>
 
 
