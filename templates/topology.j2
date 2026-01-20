@@ -1,0 +1,15 @@
+name: project
+
+topology:
+    nodes:
+      {% for node in nodes %}
+      {{ node.name }}:
+        kind: linux
+        image: quay.io/frrouting/frr:10.4.1
+        startup-config: configs/{{ node.name }}.cfg
+      {% endfor %}
+
+    links:
+      {% for link in links %}
+          - endpoints: ["{{ link.a }}:{{ link.a_port }}", "{{ link.b }}:{{ link.b_port }}"]
+      {% endfor %}

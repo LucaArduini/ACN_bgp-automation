@@ -1,0 +1,44 @@
+nodes:
+  - name: ce1
+    role: ce
+    mgmt_ip: 172.20.20.11
+  - name: ce2
+    role: pe
+    mgmt_ip: 172.20.20.12
+  - name: pe1
+    role: pe
+    mgmt_ip: 172.20.20.13
+  - name: pe2
+    role: pe
+    mgmt_ip: 172.20.20.14
+  - name: gw1
+    role: pe
+    mgmt_ip: 172.20.20.15
+  - name: gw2
+    role: pe
+    mgmt_ip: 172.20.20.16
+  - name: up1
+    role: pe
+    mgmt_ip: 172.20.20.17
+  - name: up2
+    role: pe
+    mgmt_ip: 172.20.20.18
+
+  - name: lan
+    role: bridge
+    kind: bridge
+
+links:
+  - { a: "ce1", a_port: "ce1-eth1", b: "pe1", b_port: "pe1-eth1" }
+  - { a: "ce1", a_port: "ce1-eth2", b: "pe2", b_port: "pe2-eth1" }
+
+  - { a: "ce2", a_port: "ce2-eth1", b: "pe1", b_port: "pe1-eth2" }
+  - { a: "ce2", a_port: "ce2-eth2", b: "pe2", b_port: "pe2-eth2" }
+
+  - { a: "pe1", a_port: "pe1-eth3", b: "lan", b_port: "lan-eth1" }
+  - { a: "pe2", a_port: "p2-eth3", b: "lan", b_port: "lan-eth2" }
+  - { a: "gw1", a_port: "gw1-eth3", b: "lan", b_port: "lan-eth3" }
+  - { a: "gw2", a_port: "gw2-eth3", b: "lan", b_port: "lan-eth4" }
+
+  - { a: "gw1", a_port: "gw1-eth4", b: "up1", b_port: "up1-eth1" }
+  - { a: "gw2", a_port: "gw2-eth4", b: "up2", b_port: "up2-eth1" }

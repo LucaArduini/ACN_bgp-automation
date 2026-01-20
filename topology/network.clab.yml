@@ -1,0 +1,72 @@
+name: project
+
+topology:
+    nodes:
+      ce1:
+        kind: linux
+        image: quay.io/frrouting/frr:10.4.1
+        startup-config: configs/ce1.cfg
+      
+      ce2:
+        kind: linux
+        image: quay.io/frrouting/frr:10.4.1
+        startup-config: configs/ce2.cfg
+      
+      pe1:
+        kind: linux
+        image: quay.io/frrouting/frr:10.4.1
+        startup-config: configs/pe1.cfg
+      
+      pe2:
+        kind: linux
+        image: quay.io/frrouting/frr:10.4.1
+        startup-config: configs/pe2.cfg
+      
+      gw1:
+        kind: linux
+        image: quay.io/frrouting/frr:10.4.1
+        startup-config: configs/gw1.cfg
+      
+      gw2:
+        kind: linux
+        image: quay.io/frrouting/frr:10.4.1
+        startup-config: configs/gw2.cfg
+      
+      up1:
+        kind: linux
+        image: quay.io/frrouting/frr:10.4.1
+        startup-config: configs/up1.cfg
+      
+      up2:
+        kind: linux
+        image: quay.io/frrouting/frr:10.4.1
+        startup-config: configs/up2.cfg
+      
+      lan:
+        kind: linux
+        image: quay.io/frrouting/frr:10.4.1
+        startup-config: configs/lan.cfg
+      
+
+    links:
+      
+          - endpoints: ["ce1:ce1-eth1", "pe1:pe1-eth1"]
+      
+          - endpoints: ["ce1:ce1-eth2", "pe2:pe2-eth1"]
+      
+          - endpoints: ["ce2:ce2-eth1", "pe1:pe1-eth2"]
+      
+          - endpoints: ["ce2:ce2-eth2", "pe2:pe2-eth2"]
+      
+          - endpoints: ["pe1:pe1-eth3", "lan:lan-eth1"]
+      
+          - endpoints: ["pe2:p2-eth3", "lan:lan-eth2"]
+      
+          - endpoints: ["gw1:gw1-eth3", "lan:lan-eth3"]
+      
+          - endpoints: ["gw2:gw2-eth3", "lan:lan-eth4"]
+      
+          - endpoints: ["gw1:gw1-eth4", "up1:up1-eth1"]
+      
+          - endpoints: ["gw2:gw2-eth4", "up2:up2-eth1"]
+      

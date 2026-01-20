@@ -27,3 +27,5 @@ Thumbs.db
 /temp/
 /output/
 /cache/
+
+venv
