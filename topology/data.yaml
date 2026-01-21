@@ -1,4 +1,13 @@
 nodes:
+  - name: n1
+    role: host
+    mgmt_ip: 172.20.20.8
+  - name: n2
+    role: host
+    mgmt_ip: 172.20.20.9
+  - name: n3 # internet
+    role: host
+    mgmt_ip: 172.20.20.10
   - name: ce1
     role: ce
     mgmt_ip: 172.20.20.11
@@ -42,3 +51,9 @@ links:
 
   - { a: "gw1", a_port: "gw1-eth4", b: "up1", b_port: "up1-eth1" }
   - { a: "gw2", a_port: "gw2-eth4", b: "up2", b_port: "up2-eth1" }
+
+  - { a: "n1", a_port: "n1-eth1", b: "ce1", b_port: "ce1-eth10" }
+  - { a: "n2", a_port: "n2-eth2", b: "ce2", b_port: "ce2-eth10" }
+
+  - { a: "up1", a_port: "up1-eth10", b: "n3", b_port: "n3-eth1" }
+  - { a: "up2", a_port: "up2-eth10", b: "n3", b_port: "n3-eth2" }
