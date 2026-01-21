@@ -16,6 +16,10 @@ template = environment.get_template("config.j2")
 device = {
     "hostname": "CE2",
     "dhcp_server": False,
+    "bgp": {
+        "asn": 65000,
+        "router_id": "10.0.0.1",
+    }
 }
 
 intf = [

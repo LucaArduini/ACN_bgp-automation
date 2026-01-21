@@ -1,7 +1,16 @@
 nodes:
   - name: n1
     role: host
+    ipv4_address: 172.20.20.8
+    ipv4_mask: /32
     mgmt_ip: 172.20.20.8
+    interfaces:
+      - { name: n1-eth1, ipv4_address: "10.1.1.0", ipv4_mask: /31 }
+      - { name: n1-eth2, ipv4_address: "10.1.1.2", ipv4_mask: /31 }
+    bgp:
+      router_id: 172.0.0.1
+      asn: 60052
+  
   - name: n2
     role: host
     mgmt_ip: 172.20.20.9
@@ -11,6 +20,13 @@ nodes:
   - name: ce1
     role: ce
     mgmt_ip: 172.20.20.11
+    interfaces:
+      - { name: ce1-eth10, ipv4_address: "20.1.1.0", ipv4_mask: /31 }
+      - { name: ce1-eth1, ipv4_address: "20.1.1.3", ipv4_mask: /31 }
+      - { name: ce1-eth2, ipv4_address: "20.1.1.4", ipv4_mask: /31 }
+    bgp:
+      router_id: 172.0.0.2
+      asn: 60053
   - name: ce2
     role: pe
     mgmt_ip: 172.20.20.12

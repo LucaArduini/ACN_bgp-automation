@@ -1,32 +1,37 @@
 frr version 10.0.2_git
 frr defaults traditional
 
-hostname {{ device.hostname }}
-
-{%- if device.dhcp_server %}
-dhcp server
-   subnet {{ device.dhcp_server.subnet }}
-      range {{ device.dhcp_server.range }}
-{%- endif %}
+hostname {{ device.name }}
 
 log syslog informational
 service integrated-vtysh-config
 !
-
-{%- for intf in interfaces %}
+{% for intf in interfaces %}
 interface {{ intf.name }}
-   {%- if intf.switch is defined and intf.switch == 0 %}
-   no switchport
-   {%- endif %}
-   {%- if intf.ipv4_address %}
-   ip address {{ intf.ipv4_address }}{{ intf.ipv4_mask }}
-   {%- endif %}
-   {%- if intf.ipv6_address %}
-   ipv6 address {{ intf.ipv6_address }}{{ intf.ipv6_mask }}
-   {%- endif %}
-   {%- if intf.dhcp %}
-   dhcp server ipv4
-   {%- endif %}
+  {% if intf.ipv4_address %}
+  ip address {{ intf.ipv4_address }}{{ intf.ipv4_mask }}
+  {% endif %}
 exit
 !
-{%- endfor %}
+{% endfor %}
+
+{% if device.bgp %}
+router bgp {{ device.bgp.asn }}
+  bgp router-id {{ device.bgp.router_id }}
+  no bgp ebgp-requires-policy
+  
+  {% for neighbor in neighbors %}
+  neighbor {{ neighbor.ip }} remote-as {{ neighbor.remote_as }}
+  {% if neighbor.type == 'ibgp' %}
+  neighbor {{ neighbor.ip }} next-hop-self
+  {% endif %}
+  {% if neighbor.policy and neighbor.policy.type == 'set_local_pref' %}
+  neighbor {{ neighbor.ip }} route-map RM_LP_IN in
+  {% endif %}
+  {% endfor %}
+exit
+!
+route-map RM_LP_IN permit 10
+  set local-preference 200
+!
+{% endif %}
