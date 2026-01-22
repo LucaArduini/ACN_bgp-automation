@@ -28,6 +28,6 @@ Thumbs.db
 /output/
 /cache/
 
-/configs/
+/configs/*.conf
 
 venv

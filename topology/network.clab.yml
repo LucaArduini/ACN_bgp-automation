@@ -8,9 +8,18 @@ topology:
         kind: linux
         
         
-        image: quay.io/frrouting/frr:10.4.1
-        mgmt-ipv4: 172.20.20.8
-        startup-config: configs/n1.conf
+        
+        image: alpine:latest 
+        env: 
+          MY_INTF: eth1
+          MY_IP: 192.168.1.10/24
+          MY_GW: 192.168.1.1
+        binds:  
+        - ./configs/linux-host-cfg.sh:/linux-cfg.sh
+        exec: 
+          - echo "script on n1"
+          - sh /linux-cfg.sh 
+        
         
       
       n2:
@@ -18,89 +27,18 @@ topology:
         kind: linux
         
         
-        image: quay.io/frrouting/frr:10.4.1
-        mgmt-ipv4: 172.20.20.9
-        startup-config: configs/n2.conf
         
-      
-      ce1:
+        image: alpine:latest 
+        env: 
+          MY_INTF: eth1
+          MY_IP: 192.168.2.7/24
+          MY_GW: 192.168.2.1
+        binds:  
+        - ./configs/linux-host-cfg.sh:/linux-cfg.sh
+        exec: 
+          - echo "script on n2"
+          - sh /linux-cfg.sh 
         
-        kind: linux
-        
-        
-        image: quay.io/frrouting/frr:10.4.1
-        mgmt-ipv4: 172.20.20.11
-        startup-config: configs/ce1.conf
-        
-      
-      ce2:
-        
-        kind: linux
-        
-        
-        image: quay.io/frrouting/frr:10.4.1
-        mgmt-ipv4: 172.20.20.12
-        startup-config: configs/ce2.conf
-        
-      
-      pe1:
-        
-        kind: linux
-        
-        
-        image: quay.io/frrouting/frr:10.4.1
-        mgmt-ipv4: 172.20.20.13
-        startup-config: configs/pe1.conf
-        
-      
-      pe2:
-        
-        kind: linux
-        
-        
-        image: quay.io/frrouting/frr:10.4.1
-        mgmt-ipv4: 172.20.20.14
-        startup-config: configs/pe2.conf
-        
-      
-      gw1:
-        
-        kind: linux
-        
-        
-        image: quay.io/frrouting/frr:10.4.1
-        mgmt-ipv4: 172.20.20.15
-        startup-config: configs/gw1.conf
-        
-      
-      gw2:
-        
-        kind: linux
-        
-        
-        image: quay.io/frrouting/frr:10.4.1
-        mgmt-ipv4: 172.20.20.16
-        startup-config: configs/gw2.conf
-        
-      
-      up1:
-        
-        kind: linux
-        
-        
-        image: quay.io/frrouting/frr:10.4.1
-        mgmt-ipv4: 172.20.20.17
-        startup-config: configs/up1.conf
-        
-      
-      up2:
-        
-        kind: linux
-        
-        
-        image: quay.io/frrouting/frr:10.4.1
-        mgmt-ipv4: 172.20.20.18
-        startup-config: configs/up2.conf
         
       
       n3:
@@ -108,9 +46,106 @@ topology:
         kind: linux
         
         
+        
+        image: alpine:latest 
+        env: 
+          MY_INTF: eth1
+          MY_IP: 10.4.1.10/24
+          MY_GW: 10.4.1.0
+        binds:  
+        - ./configs/linux-host-cfg.sh:/linux-cfg.sh
+        exec: 
+          - echo "script on n3"
+          - sh /linux-cfg.sh 
+        
+        
+      
+      ce1:
+        
+        kind: linux
+        
+        
+        
         image: quay.io/frrouting/frr:10.4.1
-        mgmt-ipv4: 172.20.20.10
-        startup-config: configs/n3.conf
+        startup-config: configs/ce1.conf
+        
+        
+      
+      ce2:
+        
+        kind: linux
+        
+        
+        
+        image: quay.io/frrouting/frr:10.4.1
+        startup-config: configs/ce2.conf
+        
+        
+      
+      pe1:
+        
+        kind: linux
+        
+        
+        
+        image: quay.io/frrouting/frr:10.4.1
+        startup-config: configs/pe1.conf
+        
+        
+      
+      pe2:
+        
+        kind: linux
+        
+        
+        
+        image: quay.io/frrouting/frr:10.4.1
+        startup-config: configs/pe2.conf
+        
+        
+      
+      gw1:
+        
+        kind: linux
+        
+        
+        
+        image: quay.io/frrouting/frr:10.4.1
+        startup-config: configs/gw1.conf
+        
+        
+      
+      gw2:
+        
+        kind: linux
+        
+        
+        
+        image: quay.io/frrouting/frr:10.4.1
+        startup-config: configs/gw2.conf
+        
+        
+      
+      up1:
+        
+        kind: linux
+        
+        
+        
+        image: quay.io/frrouting/frr:10.4.1
+        startup-config: configs/up1.conf
+        
+        
+      
+      up2:
+        
+        kind: linux
+        
+        
+        
+        image: quay.io/frrouting/frr:10.4.1
+        startup-config: configs/up2.conf
+        
         
       
       lan:
@@ -122,31 +157,102 @@ topology:
 
     links:
       
-          - endpoints: ["n1:n1-eth1", "ce1:ce1-eth10"]
+          - endpoints: ["n1:eth1", "ce1:eth10"]
       
-          - endpoints: ["n2:n2-eth2", "ce2:ce2-eth10"]
+          - endpoints: ["n2:eth1", "ce2:eth10"]
       
-          - endpoints: ["ce1:ce1-eth1", "pe1:pe1-eth1"]
+          - endpoints: ["ce1:eth1", "pe1:eth1"]
       
-          - endpoints: ["ce1:ce1-eth2", "pe2:pe2-eth1"]
+          - endpoints: ["ce1:eth2", "pe2:eth1"]
       
-          - endpoints: ["ce2:ce2-eth1", "pe1:pe1-eth2"]
+          - endpoints: ["ce2:eth1", "pe1:eth2"]
       
-          - endpoints: ["ce2:ce2-eth2", "pe2:pe2-eth2"]
+          - endpoints: ["ce2:eth2", "pe2:eth2"]
       
-          - endpoints: ["pe1:pe1-eth3", "lan:lan-eth1"]
+          - endpoints: ["pe1:eth3", "lan:eth1"]
       
-          - endpoints: ["pe2:p2-eth3", "lan:lan-eth2"]
+          - endpoints: ["pe2:eth3", "lan:eth2"]
       
-          - endpoints: ["gw1:gw1-eth3", "lan:lan-eth3"]
+          - endpoints: ["gw1:eth3", "lan:eth3"]
       
-          - endpoints: ["gw2:gw2-eth3", "lan:lan-eth4"]
+          - endpoints: ["gw2:eth3", "lan:eth4"]
       
-          - endpoints: ["gw1:gw1-eth4", "up1:up1-eth1"]
+          - endpoints: ["gw1:eth4", "up1:eth1"]
       
-          - endpoints: ["gw2:gw2-eth4", "up2:up2-eth1"]
+          - endpoints: ["gw2:eth4", "up2:eth1"]
       
-          - endpoints: ["up1:up1-eth10", "n3:n3-eth1"]
+          - endpoints: ["up1:eth10", "n3:eth1"]
       
-          - endpoints: ["up2:up2-eth10", "n3:n3-eth2"]
+          - endpoints: ["up2:eth10", "n3:eth2"]
+      
+
+      
+        
+      
+        
+      
+        
+      
+        
+          - type: dummy
+            endpoint:
+              node: ce1
+              interface: l0
+        
+      
+        
+          - type: dummy
+            endpoint:
+              node: ce2
+              interface: l0
+        
+      
+        
+          - type: dummy
+            endpoint:
+              node: pe1
+              interface: l0
+        
+      
+        
+          - type: dummy
+            endpoint:
+              node: pe2
+              interface: l0
+        
+      
+        
+          - type: dummy
+            endpoint:
+              node: gw1
+              interface: l0
+        
+      
+        
+          - type: dummy
+            endpoint:
+              node: gw2
+              interface: l0
+        
+      
+        
+          - type: dummy
+            endpoint:
+              node: up1
+              interface: l0
+        
+      
+        
+          - type: dummy
+            endpoint:
+              node: up2
+              interface: l0
+        
+      
+        
+          - type: dummy
+            endpoint:
+              node: lan
+              interface: l0
+        
       
