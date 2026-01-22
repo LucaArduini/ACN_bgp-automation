@@ -1,4 +1,4 @@
-Project for the "**Advanced Network Architectures And Wireless Systems**" class (2025-26) at Pisa University.<br>
+Project for the "**Advanced Computer Networking**" class (2025-26) at Pisa University.<br>
 Group work carried out by the students: [Luca Arduini](https://github.com/LucaArduini), [Valerio Triolo](https://github.com/valeriot30).
 
 # 📡 ACN – BGP Network Automation Project
