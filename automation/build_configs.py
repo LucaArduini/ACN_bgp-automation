@@ -42,6 +42,9 @@ def get_remote_ip(node_name, port_name):
     return None
 
 for node in nodes:
+
+    if node['role'] == 'host': continue
+
     hostname = node['name']
     if 'interfaces' not in node: continue
 
