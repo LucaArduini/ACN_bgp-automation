@@ -41,16 +41,14 @@ def get_remote_ip(node_name, port_name):
                 return iface.get('ipv4_address')
     return None
 
-# Elaborazione
 for node in nodes:
     hostname = node['name']
     if 'interfaces' not in node: continue
 
-    # Calcolo Neighbors dinamico
     neighbors = []
     if 'bgp' in node:
         for link in links:
-            # Determiniamo se il nodo corrente è parte di questo link
+          
             if link['a'] == hostname:
                 remote_name = link['b']
                 remote_port = link['b_port']
@@ -60,7 +58,6 @@ for node in nodes:
             else:
                 continue
             
-            # Verifichiamo se il vicino ha il BGP configurato
             remote_node = nodes_map.get(remote_name)
             if remote_node and 'bgp' in remote_node:
                 remote_ip = get_remote_ip(remote_name, remote_port)
@@ -71,14 +68,12 @@ for node in nodes:
                         "description": f"Link_to_{remote_name}"
                     })
 
-    # Rendering del template
     config = template.render(
         device=node,
         interfaces=node['interfaces'],
         neighbors=neighbors
     )
-
-    # Scrittura file
+    
     os.makedirs("configs", exist_ok=True)
     with open(f"configs/{hostname}.conf", "w") as f:
         f.write(config)
