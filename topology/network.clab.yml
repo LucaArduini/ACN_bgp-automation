@@ -10,7 +10,7 @@ topology:
         
         image: quay.io/frrouting/frr:10.4.1
         mgmt-ipv4: 172.20.20.8
-        startup-config: configs/n1.cfg
+        startup-config: configs/n1.conf
         
       
       n2:
@@ -20,7 +20,7 @@ topology:
         
         image: quay.io/frrouting/frr:10.4.1
         mgmt-ipv4: 172.20.20.9
-        startup-config: configs/n2.cfg
+        startup-config: configs/n2.conf
         
       
       n3:
@@ -30,7 +30,7 @@ topology:
         
         image: quay.io/frrouting/frr:10.4.1
         mgmt-ipv4: 172.20.20.10
-        startup-config: configs/n3.cfg
+        startup-config: configs/n3.conf
         
       
       ce1:
@@ -40,7 +40,7 @@ topology:
         
         image: quay.io/frrouting/frr:10.4.1
         mgmt-ipv4: 172.20.20.11
-        startup-config: configs/ce1.cfg
+        startup-config: configs/ce1.conf
         
       
       ce2:
@@ -50,7 +50,7 @@ topology:
         
         image: quay.io/frrouting/frr:10.4.1
         mgmt-ipv4: 172.20.20.12
-        startup-config: configs/ce2.cfg
+        startup-config: configs/ce2.conf
         
       
       pe1:
@@ -60,7 +60,7 @@ topology:
         
         image: quay.io/frrouting/frr:10.4.1
         mgmt-ipv4: 172.20.20.13
-        startup-config: configs/pe1.cfg
+        startup-config: configs/pe1.conf
         
       
       pe2:
@@ -70,7 +70,7 @@ topology:
         
         image: quay.io/frrouting/frr:10.4.1
         mgmt-ipv4: 172.20.20.14
-        startup-config: configs/pe2.cfg
+        startup-config: configs/pe2.conf
         
       
       gw1:
@@ -80,7 +80,7 @@ topology:
         
         image: quay.io/frrouting/frr:10.4.1
         mgmt-ipv4: 172.20.20.15
-        startup-config: configs/gw1.cfg
+        startup-config: configs/gw1.conf
         
       
       gw2:
@@ -90,7 +90,7 @@ topology:
         
         image: quay.io/frrouting/frr:10.4.1
         mgmt-ipv4: 172.20.20.16
-        startup-config: configs/gw2.cfg
+        startup-config: configs/gw2.conf
         
       
       up1:
@@ -100,7 +100,7 @@ topology:
         
         image: quay.io/frrouting/frr:10.4.1
         mgmt-ipv4: 172.20.20.17
-        startup-config: configs/up1.cfg
+        startup-config: configs/up1.conf
         
       
       up2:
@@ -110,10 +110,11 @@ topology:
         
         image: quay.io/frrouting/frr:10.4.1
         mgmt-ipv4: 172.20.20.18
-        startup-config: configs/up2.cfg
+        startup-config: configs/up2.conf
         
       
       lan:
+        
         kind: bridge
         
         
