@@ -1,11 +1,10 @@
 import jinja2
 import os
 import yaml
+import ipaddress
 from jinja2 import Environment, FileSystemLoader
 
-
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
 TEMPLATES_DIR = os.path.join(BASE_DIR, "..", "templates")
 TOPOLOGY_DIR = os.path.join(BASE_DIR, "..", "topology")
 DATA_FILE = os.path.join(TOPOLOGY_DIR, "data.yaml")
@@ -23,17 +22,7 @@ nodes = data['nodes']
 links = data['links']
 nodes_map = {n['name']: n for n in nodes}
 
-def get_interface_ip(node_name, port_name):
-    node = nodes_map.get(node_name)
-    if not node or 'interfaces' not in node:
-        return None
-    for iface in node['interfaces']:
-        if iface['name'] == port_name:
-            return iface['ip'].split('/')[0]
-    return None
-
 def get_remote_ip(node_name, port_name):
-    """Cerca l'IP configurato sull'interfaccia di un nodo specifico"""
     node = nodes_map.get(node_name)
     if node and 'interfaces' in node:
         for iface in node['interfaces']:
@@ -41,43 +30,78 @@ def get_remote_ip(node_name, port_name):
                 return iface.get('ipv4_address')
     return None
 
+def get_network_address(ip, mask):
+    try:
+        interface = ipaddress.IPv4Interface(f"{ip}{mask}")
+        return str(interface.network)
+    except ValueError:
+        return None
+
 for node in nodes:
 
-    if node['role'] == 'host': continue
+    if node.get('role') == 'host' or 'interfaces' not in node:
+        continue
 
     hostname = node['name']
-    if 'interfaces' not in node: continue
+    neighbors_dict = {}
+    bgp_networks = set()
+    
+    local_asn = node['bgp']['asn'] if 'bgp' in node else None
 
-    neighbors = []
-    if 'bgp' in node:
+    if local_asn:
+        for iface in node['interfaces']:
+            mask = iface['ipv4_mask']
+      
+            if mask == '/24' or mask == '/32' or mask == '/28':
+                net = get_network_address(iface['ipv4_address'], mask)
+                if net: bgp_networks.add(net)
+    if local_asn:
         for link in links:
-          
             if link['a'] == hostname:
-                remote_name = link['b']
-                remote_port = link['b_port']
+                remote_name, remote_port = link['b'], link['b_port']
             elif link['b'] == hostname:
-                remote_name = link['a']
-                remote_port = link['a_port']
+                remote_name, remote_port = link['a'], link['a_port']
             else:
                 continue
             
             remote_node = nodes_map.get(remote_name)
-            if remote_node and 'bgp' in remote_node:
-                remote_ip = get_remote_ip(remote_name, remote_port)
-                if remote_ip:
-                    neighbors.append({
-                        "ip": remote_ip,
+            if not remote_node: continue
+
+            if 'bgp' in remote_node:
+                r_ip = get_remote_ip(remote_name, remote_port)
+                if r_ip:
+                    neighbors_dict[r_ip] = {
+                        "ip": r_ip,
                         "remote_as": remote_node['bgp']['asn'],
+                        "type": 'ibgp' if remote_node['bgp']['asn'] == local_asn else 'ebgp',
                         "description": f"Link_to_{remote_name}"
-                    })
+                    }
+                    
+            if remote_node.get('role') == 'bridge' or remote_node.get('kind') == 'bridge':
+                for l in links:
+                    p_name, p_port = ("", "")
+                    if l['a'] == remote_name: p_name, p_port = l['b'], l['b_port']
+                    elif l['b'] == remote_name: p_name, p_port = l['a'], l['a_port']
+                    
+                    if p_name and p_name != hostname:
+                        p_node = nodes_map.get(p_name)
+                        if p_node and 'bgp' in p_node and p_node['bgp']['asn'] == local_asn:
+                            p_ip = get_remote_ip(p_name, p_port)
+                            if p_ip:
+                                neighbors_dict[p_ip] = {
+                                    "ip": p_ip,
+                                    "remote_as": local_asn,
+                                    "type": 'ibgp',
+                                    "description": f"iBGP_via_{remote_name}"
+                                }
 
     config = template.render(
         device=node,
         interfaces=node['interfaces'],
-        neighbors=neighbors
+        neighbors=list(neighbors_dict.values()),
+        networks=list(bgp_networks)
     )
     
-    os.makedirs("configs", exist_ok=True)
-    with open(f"configs/{hostname}.conf", "w") as f:
+    with open(os.path.join(OUTPUT_DIR, f"{hostname}.conf"), "w") as f:
         f.write(config)
     print(f"Generata config per {hostname}")

@@ -18,6 +18,10 @@ router bgp {{ device.bgp.asn }}
   bgp router-id {{ device.bgp.router_id }}
   no bgp ebgp-requires-policy
   
+  {% for net in networks %}
+  network {{ net }}
+  {% endfor %}
+
   {% for neighbor in neighbors %}
   neighbor {{ neighbor.ip }} remote-as {{ neighbor.remote_as }}
   {% if neighbor.type == 'ibgp' %}
