@@ -12,8 +12,8 @@ topology:
         image: alpine:latest 
         env: 
           MY_INTF: eth1
-          MY_IP: 192.168.1.10/24
-          MY_GW: 192.168.1.1
+          MY_IP: 198.51.100.3/24
+          MY_GW: 198.51.100.1
         binds:  
         - ./configs/linux-host-cfg.sh:/linux-cfg.sh
         exec: 
@@ -31,31 +31,12 @@ topology:
         image: alpine:latest 
         env: 
           MY_INTF: eth1
-          MY_IP: 192.168.2.7/24
-          MY_GW: 192.168.2.1
+          MY_IP: 192.0.2.0/24
+          MY_GW: 192.0.2.1
         binds:  
         - ./configs/linux-host-cfg.sh:/linux-cfg.sh
         exec: 
           - echo "script on n2"
-          - sh /linux-cfg.sh 
-        
-        
-      
-      n3:
-        
-        kind: linux
-        
-        
-        
-        image: alpine:latest 
-        env: 
-          MY_INTF: eth1
-          MY_IP: 10.4.1.10/24
-          MY_GW: 10.4.1.0
-        binds:  
-        - ./configs/linux-host-cfg.sh:/linux-cfg.sh
-        exec: 
-          - echo "script on n3"
           - sh /linux-cfg.sh 
         
         
@@ -188,6 +169,22 @@ topology:
         
         
       
+      r3:
+        
+        kind: linux
+        
+        
+        
+        image: quay.io/frrouting/frr:10.4.1
+        startup-config: configs/r3.conf
+        binds:
+          - ./configs/r3.conf:/etc/frr/frr.conf
+          - ./configs/frr/daemons:/etc/frr/daemons
+          - ./configs/frr/vtysh.conf:/etc/frr/vtysh.conf
+          - ./configs/frr/frr-cfg.sh:/frr-cfg.sh
+        
+        
+      
       lan:
         
         kind: bridge
@@ -197,7 +194,7 @@ topology:
 
     links:
       
-          - endpoints: ["n1:eth1", "ce1:eth10"]
+          - endpoints: ["n1:eth1", "ce1:eth3"]
       
           - endpoints: ["n2:eth1", "ce2:eth10"]
       
@@ -205,29 +202,27 @@ topology:
       
           - endpoints: ["ce1:eth2", "pe2:eth1"]
       
-          - endpoints: ["ce2:eth1", "pe1:eth2"]
+          - endpoints: ["ce2:eth1", "pe1:eth3"]
       
-          - endpoints: ["ce2:eth2", "pe2:eth2"]
+          - endpoints: ["ce2:eth2", "pe2:eth3"]
       
-          - endpoints: ["pe1:eth3", "lan:eth1"]
+          - endpoints: ["pe1:eth4", "lan:eth1"]
       
-          - endpoints: ["pe2:eth3", "lan:eth2"]
+          - endpoints: ["pe2:eth4", "lan:eth2"]
       
           - endpoints: ["gw1:eth3", "lan:eth3"]
       
           - endpoints: ["gw2:eth3", "lan:eth4"]
       
-          - endpoints: ["gw1:eth4", "up1:eth1"]
+          - endpoints: ["gw1:eth2", "up1:eth1"]
       
-          - endpoints: ["gw2:eth4", "up2:eth1"]
+          - endpoints: ["gw2:eth2", "up2:eth1"]
       
-          - endpoints: ["up1:eth10", "n3:eth1"]
+          - endpoints: ["up1:eth2", "r3:eth1"]
       
-          - endpoints: ["up2:eth10", "n3:eth2"]
+          - endpoints: ["up2:eth2", "r3:eth2"]
       
 
-      
-        
       
         
       
@@ -286,6 +281,13 @@ topology:
           - type: dummy
             endpoint:
               node: up2
+              interface: l0
+        
+      
+        
+          - type: dummy
+            endpoint:
+              node: r3
               interface: l0
         
       
