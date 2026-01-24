@@ -54,7 +54,7 @@ nodes:
     role: pe
     mgmt_ip: 172.20.20.13
     bgp:
-      asn: 65000
+      asn: 65020
       router_id: 10.0.0.11
     interfaces:
       - { name: eth1, ipv4_address: "10.1.1.1", ipv4_mask: /31 }
@@ -65,7 +65,7 @@ nodes:
     role: pe
     mgmt_ip: 172.20.20.14
     bgp:
-      asn: 65000
+      asn: 65020
       router_id: 10.0.0.12
     interfaces:
       - { name: eth1, ipv4_address: "10.1.1.3", ipv4_mask: /31 }  
@@ -76,7 +76,7 @@ nodes:
     role: gw
     ipv4_address: 10.3.0.1
     bgp:
-      asn: 65000
+      asn: 65020
       router_id: 10.0.0.21
     interfaces:
       - { name: eth3, ipv4_address: "10.2.0.21", ipv4_mask: /24 }
@@ -86,7 +86,7 @@ nodes:
     role: gw
     ipv4_address: 10.3.0.1
     bgp:
-      asn: 65000
+      asn: 65020
       router_id: 10.0.0.22
     interfaces:
       - { name: eth3, ipv4_address: "10.2.0.22", ipv4_mask: /24 }

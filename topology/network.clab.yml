@@ -68,6 +68,11 @@ topology:
         
         image: quay.io/frrouting/frr:10.4.1
         startup-config: configs/ce1.conf
+        binds:
+          - ./configs/ce1.conf:/etc/frr/frr.conf
+          - ./configs/frr/daemons:/etc/frr/daemons
+          - ./configs/frr/vtysh.conf:/etc/frr/vtysh.conf
+          - ./configs/frr/frr-cfg.sh:/frr-cfg.sh
         
         
       
@@ -79,6 +84,11 @@ topology:
         
         image: quay.io/frrouting/frr:10.4.1
         startup-config: configs/ce2.conf
+        binds:
+          - ./configs/ce2.conf:/etc/frr/frr.conf
+          - ./configs/frr/daemons:/etc/frr/daemons
+          - ./configs/frr/vtysh.conf:/etc/frr/vtysh.conf
+          - ./configs/frr/frr-cfg.sh:/frr-cfg.sh
         
         
       
@@ -90,6 +100,11 @@ topology:
         
         image: quay.io/frrouting/frr:10.4.1
         startup-config: configs/pe1.conf
+        binds:
+          - ./configs/pe1.conf:/etc/frr/frr.conf
+          - ./configs/frr/daemons:/etc/frr/daemons
+          - ./configs/frr/vtysh.conf:/etc/frr/vtysh.conf
+          - ./configs/frr/frr-cfg.sh:/frr-cfg.sh
         
         
       
@@ -101,6 +116,11 @@ topology:
         
         image: quay.io/frrouting/frr:10.4.1
         startup-config: configs/pe2.conf
+        binds:
+          - ./configs/pe2.conf:/etc/frr/frr.conf
+          - ./configs/frr/daemons:/etc/frr/daemons
+          - ./configs/frr/vtysh.conf:/etc/frr/vtysh.conf
+          - ./configs/frr/frr-cfg.sh:/frr-cfg.sh
         
         
       
@@ -112,6 +132,11 @@ topology:
         
         image: quay.io/frrouting/frr:10.4.1
         startup-config: configs/gw1.conf
+        binds:
+          - ./configs/gw1.conf:/etc/frr/frr.conf
+          - ./configs/frr/daemons:/etc/frr/daemons
+          - ./configs/frr/vtysh.conf:/etc/frr/vtysh.conf
+          - ./configs/frr/frr-cfg.sh:/frr-cfg.sh
         
         
       
@@ -123,6 +148,11 @@ topology:
         
         image: quay.io/frrouting/frr:10.4.1
         startup-config: configs/gw2.conf
+        binds:
+          - ./configs/gw2.conf:/etc/frr/frr.conf
+          - ./configs/frr/daemons:/etc/frr/daemons
+          - ./configs/frr/vtysh.conf:/etc/frr/vtysh.conf
+          - ./configs/frr/frr-cfg.sh:/frr-cfg.sh
         
         
       
@@ -134,6 +164,11 @@ topology:
         
         image: quay.io/frrouting/frr:10.4.1
         startup-config: configs/up1.conf
+        binds:
+          - ./configs/up1.conf:/etc/frr/frr.conf
+          - ./configs/frr/daemons:/etc/frr/daemons
+          - ./configs/frr/vtysh.conf:/etc/frr/vtysh.conf
+          - ./configs/frr/frr-cfg.sh:/frr-cfg.sh
         
         
       
@@ -145,6 +180,11 @@ topology:
         
         image: quay.io/frrouting/frr:10.4.1
         startup-config: configs/up2.conf
+        binds:
+          - ./configs/up2.conf:/etc/frr/frr.conf
+          - ./configs/frr/daemons:/etc/frr/daemons
+          - ./configs/frr/vtysh.conf:/etc/frr/vtysh.conf
+          - ./configs/frr/frr-cfg.sh:/frr-cfg.sh
         
         
       
