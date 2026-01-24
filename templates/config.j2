@@ -3,9 +3,7 @@ frr defaults traditional
 
 hostname {{ device.name }}
 
-log syslog informational
-service integrated-vtysh-config
-!
+
 {% for intf in interfaces %}
 interface {{ intf.name }}
   {% if intf.ipv4_address %}
