@@ -3,37 +3,36 @@ frr defaults traditional
 
 hostname {{ device.name }}
 
-
 {% for intf in interfaces %}
 interface {{ intf.name }}
-  {% if intf.ipv4_address %}
-  ip address {{ intf.ipv4_address }}{{ intf.ipv4_mask }}
-  {% endif %}
+    {% if intf.ipv4_address %}
+    ip address {{ intf.ipv4_address }}{{ intf.ipv4_mask }}
+    {% endif %}
 exit
 !
 {% endfor %}
 
 {% if device.bgp %}
 router bgp {{ device.bgp.asn }}
-  bgp router-id {{ device.bgp.router_id }}
-  no bgp ebgp-requires-policy
-  
-  {% for net in networks %}
-  network {{ net }}
-  {% endfor %}
+    bgp router-id {{ device.bgp.router_id }}
+    no bgp ebgp-requires-policy
+    
+    {% for net in networks %}
+    network {{ net }}
+    {% endfor %}
 
-  {% for neighbor in neighbors %}
-  neighbor {{ neighbor.ip }} remote-as {{ neighbor.remote_as }}
-  {% if neighbor.type == 'ibgp' %}
-  neighbor {{ neighbor.ip }} next-hop-self
-  {% endif %}
-  {% if neighbor.policy and neighbor.policy.type == 'set_local_pref' %}
-  neighbor {{ neighbor.ip }} route-map RM_LP_IN in
-  {% endif %}
-  {% endfor %}
+    {% for neighbor in neighbors %}
+    neighbor {{ neighbor.ip }} remote-as {{ neighbor.remote_as }}
+        {% if neighbor.type == 'ibgp' %}
+        neighbor {{ neighbor.ip }} next-hop-self
+        {% endif %}
+        {% if neighbor.policy and neighbor.policy.type == 'set_local_pref' %}
+        neighbor {{ neighbor.ip }} route-map RM_LP_IN in
+        {% endif %}
+    {% endfor %}
 exit
 !
 route-map RM_LP_IN permit 10
-  set local-preference 200
+    set local-preference 200
 !
 {% endif %}
