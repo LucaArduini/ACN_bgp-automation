@@ -1,47 +1,102 @@
-import json
+
 import random
-import time
+import yaml
+import os
 from datetime import datetime
 
-IN = ["N1", "N2"]
-OUT = ["UP1", "UP2"]
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+YAML_FILE = os.path.join(BASE_DIR, "..", "topology", "data.yaml")
+
 LINK_CAPACITY = 1000
 
-def generate_random_matrix():
-    n1_volume = random.randint(400, 1100)
-    n2_volume = random.randint(10, 150)
+def load_topology_data():
+    """Legge il file YAML e identifica le sorgenti (Righe) e le uscite (Colonne)"""
+    if not os.path.exists(YAML_FILE):
+        print(f"[ERR] File non trovato: {YAML_FILE}")
+        return [], []
 
-    volumes = {
-        "N1": n1_volume,
-        "N2": n2_volume
-    }
+    try:
+        with open(YAML_FILE, "r") as f:
+            data = yaml.safe_load(f)
+    except Exception as e:
+        print(f"[ERR] Errore parsing YAML: {e}")
+        return [], []
 
-    matrix = [
-        [0, 0], # Riga N1
-        [0, 0]  # Riga N2
-    ]
+    in_nodes = []
+    out_nodes = []
+    
+    if 'nodes' in data:
+        in_roles = ['router', 'ce', 'host']
 
-    matrix[random.randint(0, 1)][random.randint(0, 1)] = volumes["N1"]
-    matrix[random.randint(0, 1)][random.randint(0, 1)] = volumes["N2"]
+        out_roles = ['pe', 'up']
+        
+        in_nodes = [n['name'] for n in data['nodes'] 
+                         if n.get('role') in in_roles]
+        
+        out_nodes = [n['name'] for n in data['nodes'] 
+                         if n.get('role') in out_roles]
+    
+    return in_nodes, out_nodes
+
+def generate_random_matrix(rows_labels, cols_labels):
+    matrix = [[0] * len(cols_labels) for _ in range(len(rows_labels))]
+
+    for i, source in enumerate(rows_labels):
+        name = source.lower()
+    
+        if "r3" in name:
+            volume = random.randint(600, 1500)
+            
+        elif "n1" in name:
+            volume = random.randint(200, 500)
+            
+        elif "ce" in name:
+            volume = random.randint(300, 900)
+            
+        else:
+            volume = random.randint(10, 50)
+
+        if len(cols_labels) > 0:
+            chosen_exit_index = random.randint(0, len(cols_labels) - 1)
+            matrix[i][chosen_exit_index] = volume
+
+    print(f"{'Source':<8} | " + " | ".join([f"{col:>8}" for col in cols_labels]))
+    print("-" * (12 + 11 * len(cols_labels) + 15))
+    
+    for i, row_label in enumerate(rows_labels):
+        row_str = f"{row_label:<8} | "
+    
+
+        for val in matrix[i]:
+            val_str = f"{val:>8}"
+            val_str += " "
+            row_str += val_str + "| "
+            
+        print(row_str)
+    print("-" * (12 + 11 * len(cols_labels) + 15))
 
     data = {
         "timestamp": datetime.now().isoformat(),
-        "rows_labels": IN,
-        "cols_labels": OUT,
+        "rows_labels": rows_labels,
+        "cols_labels": cols_labels,
         "link_capacity": LINK_CAPACITY,
         "matrix": matrix,
     }
 
     return data
 
-data = generate_random_matrix()
+IN_NODES, OUT_NODES = load_topology_data()
+
+data = generate_random_matrix(IN_NODES, OUT_NODES)
 matrix = data["matrix"]
 
-load_up1 = matrix[0][0] + matrix[1][0]
-load_up2 = matrix[0][1] + matrix[1][1]
+loads = [0] * len(OUT_NODES)
 
-print(f"Carico Totale UP1: {load_up1} Mbps")
-print(f"Carico Totale UP2: {load_up2} Mbps")
+for row in matrix:
+    for col_idx, val in enumerate(row):
+        loads[col_idx] += val
 
-if load_up1 > (data["link_capacity"] * 0.8):
-    print("up1 is congested, increasing local pref on gw2")
+for i, node_name in enumerate(OUT_NODES):
+    load = loads[i]
+        
+    print(f"Link to {node_name}: {load:>4} Mbps")
