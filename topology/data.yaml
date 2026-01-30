@@ -27,7 +27,7 @@ nodes:
     role: ce
     bgp: { asn: 65002, router_id: 10.0.0.2 }
     interfaces:
-      - { name: eth10, ipv4_address: "192.0.0.0", ipv4_mask: /30 }  
+      - { name: eth10, ipv4_address: "192.0.2.1", ipv4_mask: /30 }  
       - { name: eth1, ipv4_address: "10.2.0.12", ipv4_mask: /24 }   
       - { name: eth2, ipv4_address: "10.2.11.6", ipv4_mask: /30 }  
 
