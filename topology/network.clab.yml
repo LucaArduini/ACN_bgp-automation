@@ -31,8 +31,8 @@ topology:
         image: alpine:latest 
         env: 
           MY_INTF: eth1
-          MY_IP: 192.0.2.0/24
-          MY_GW: 192.0.2.1
+          MY_IP: 192.0.0.3/24
+          MY_GW: 192.0.0.2
         binds:  
         - ./configs/linux-host-cfg.sh:/linux-cfg.sh
         exec: 
@@ -196,7 +196,7 @@ topology:
       
           - endpoints: ["n1:eth1", "ce1:eth3"]
       
-          - endpoints: ["n2:eth1", "ce2:eth10"]
+          - endpoints: ["n2:eth1", "ce2:eth3"]
       
           - endpoints: ["ce1:eth1", "pe1:eth1"]
       
@@ -232,69 +232,69 @@ topology:
           - type: dummy
             endpoint:
               node: ce1
-              interface: l0
+              interface: lo0
         
       
         
           - type: dummy
             endpoint:
               node: ce2
-              interface: l0
+              interface: lo0
         
       
         
           - type: dummy
             endpoint:
               node: pe1
-              interface: l0
+              interface: lo0
         
       
         
           - type: dummy
             endpoint:
               node: pe2
-              interface: l0
+              interface: lo0
         
       
         
           - type: dummy
             endpoint:
               node: gw1
-              interface: l0
+              interface: lo0
         
       
         
           - type: dummy
             endpoint:
               node: gw2
-              interface: l0
+              interface: lo0
         
       
         
           - type: dummy
             endpoint:
               node: up1
-              interface: l0
+              interface: lo0
         
       
         
           - type: dummy
             endpoint:
               node: up2
-              interface: l0
+              interface: lo0
         
       
         
           - type: dummy
             endpoint:
               node: r3
-              interface: l0
+              interface: lo0
         
       
         
           - type: dummy
             endpoint:
               node: lan
-              interface: l0
+              interface: lo0
         
       

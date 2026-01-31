@@ -9,34 +9,34 @@ nodes:
 
   - name: n2
     role: host
-    ipv4_address: 192.0.2.0
+    ipv4_address: 192.0.0.3
     ipv4_mask: /24
     interfaces:
-      - { name: eth1, ipv4_address: "192.0.0.1", ipv4_mask: /30 }
-    gateway_ip: 192.0.2.1
+      - { name: eth1, ipv4_address: "192.0.0.1", ipv4_mask: /24 }
+    gateway_ip: 192.0.0.2
 
   - name: ce1
     role: ce
     bgp: { asn: 65001, router_id: 10.0.0.1 }
     interfaces:
       - { name: eth3, ipv4_address: "198.51.100.1", ipv4_mask: /24 }
-      - { name: eth1, ipv4_address: "10.1.11.2", ipv4_mask: /24 } 
+      - { name: eth1, ipv4_address: "10.1.11.2", ipv4_mask: /30 } 
       - { name: eth2, ipv4_address: "10.1.12.2", ipv4_mask: /30 }   
 
   - name: ce2
     role: ce
     bgp: { asn: 65002, router_id: 10.0.0.2 }
     interfaces:
-      - { name: eth10, ipv4_address: "192.0.2.1", ipv4_mask: /30 }  
-      - { name: eth1, ipv4_address: "10.2.0.12", ipv4_mask: /24 }   
+      - { name: eth3, ipv4_address: "192.0.0.2", ipv4_mask: /24 }  
+      - { name: eth1, ipv4_address: "10.2.0.1", ipv4_mask: /30 }   
       - { name: eth2, ipv4_address: "10.2.11.6", ipv4_mask: /30 }  
 
   - name: pe1
     role: pe
     bgp: { asn: 65020, router_id: 10.0.0.11 }
     interfaces:
-      - { name: eth1, ipv4_address: "10.1.11.1", ipv4_mask: /24 }   
-      - { name: eth3, ipv4_address: "10.2.0.11", ipv4_mask: /24 }   
+      - { name: eth1, ipv4_address: "10.1.11.1", ipv4_mask: /30 }   
+      - { name: eth3, ipv4_address: "10.2.0.2", ipv4_mask: /30 }   
       - { name: eth4, ipv4_address: "192.168.12.1", ipv4_mask: /24 }
 
   - name: pe2
@@ -84,7 +84,7 @@ nodes:
 
       - { name: eth1, ipv4_address: "172.30.1.2", ipv4_mask: /30 }
 
-      - { name: eth2, ipv4_address: "10.4.1.0", ipv4_mask: /31 }
+      - { name: eth2, ipv4_address: "10.4.1.1", ipv4_mask: /30 }
 
   - name: up2
     role: up
@@ -94,7 +94,7 @@ nodes:
       router_id: 10.0.0.32
     interfaces:
       - { name: eth1, ipv4_address: "172.30.2.2", ipv4_mask: /30 }
-      - { name: eth2, ipv4_address: "10.4.2.0", ipv4_mask: /31 }
+      - { name: eth2, ipv4_address: "10.4.2.1", ipv4_mask: /30 }
 
   - name: r3
     role: router
@@ -102,8 +102,8 @@ nodes:
       asn: 65500
       router_id: 8.8.8.8
     interfaces:
-      - { name: eth1, ipv4_address: "10.4.1.1", ipv4_mask: /31 }
-      - { name: eth2, ipv4_address: "10.4.2.1", ipv4_mask: /31 }
+      - { name: eth1, ipv4_address: "10.4.1.2", ipv4_mask: /30 }
+      - { name: eth2, ipv4_address: "10.4.2.2", ipv4_mask: /30 }
       - { name: lo, ipv4_address: "8.8.8.8", ipv4_mask: /32 }
 
   - name: lan
@@ -112,7 +112,7 @@ nodes:
 
 links:
   - { a: "n1", a_port: "eth1", b: "ce1", b_port: "eth3" }
-  - { a: "n2", a_port: "eth1", b: "ce2", b_port: "eth10" }
+  - { a: "n2", a_port: "eth1", b: "ce2", b_port: "eth3" }
 
   - { a: "ce1", a_port: "eth1", b: "pe1", b_port: "eth1" }
   - { a: "ce1", a_port: "eth2", b: "pe2", b_port: "eth1" }
