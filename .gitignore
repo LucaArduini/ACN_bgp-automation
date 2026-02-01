@@ -1,34 +1,39 @@
-# Ignora la cartella di build
-/build/
 
-# Ignora i file temporanei di sistema
+# SISTEMA OPERATIVO
 .DS_Store
 Thumbs.db
 
-# Ignora le directory dei file oggetto e binari
+
+# AMBIENTI VIRTUALI / ENV
+venv/
+.env
+
+
+# CARTELLE DI BUILD / OUTPUT
+/build/
 /bin/
 /obj/
+/output/
+/temp/
+/cache/
 
-# Ignora i file generati da Visual Studio Code
-.vscode/
 
-# Ignora i file temporanei di compilazione
+# FILE TEMPORANEI DI COMPILAZIONE
 *.o
 *.obj
 *.exe
 *.log
 *.bak
 
-# Ignora le librerie esterne (se scaricate localmente)
+
+# EDITOR / IDE
+.vscode/
+
+
+# LIBRERIE ESTERNE LOCALI
 /external/
 /libs/
 
-# Ignora cartelle specifiche del tuo progetto
-/temp/
-/output/
-/cache/
 
-# Ignora i file di configurazione locali
+# CONFIGURAZIONI LOCALI
 /configs/*.conf
-
-venv

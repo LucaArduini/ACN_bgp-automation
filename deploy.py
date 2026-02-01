@@ -3,9 +3,20 @@ import sys
 import subprocess
 from paramiko import SSHClient, AutoAddPolicy
 from scp import SCPClient
+from dotenv import load_dotenv
+
+# Carica le variabili dal file .env
+load_dotenv()
 
 # --- CONFIGURAZIONE ---
-REMOTE_HOST = '192.168.56.101'
+# Legge la variabile d'ambiente. Se non esiste, restituisce None.
+REMOTE_HOST = os.getenv('REMOTE_HOST')
+
+# Controllo di sicurezza
+if not REMOTE_HOST:
+    print("[-] Errore: La variabile REMOTE_HOST non è definita nel file .env")
+    sys.exit(1)
+
 REMOTE_USER = 'student'
 REMOTE_PASS = 'student'
 # Creiamo una cartella dedicata per mantenere l'ordine e far funzionare i path relativi
