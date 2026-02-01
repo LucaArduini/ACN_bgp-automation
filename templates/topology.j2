@@ -18,17 +18,17 @@ topology:
           MY_IP: {{ node.ipv4_address }}/24
           MY_GW: {{ node.gateway_ip }}
         binds:  
-        - ./configs/linux-host-cfg.sh:/linux-cfg.sh
+        - ../configs/linux-host-cfg.sh:/linux-cfg.sh
         exec: 
           - echo "script on {{ node.name }}"
           - sh /linux-cfg.sh 
         {% else %}
         image: quay.io/frrouting/frr:10.4.1
         binds:
-          - ./configs/{{ node.name }}.conf:/etc/frr/frr.conf
-          - ./configs/frr/daemons:/etc/frr/daemons
-          - ./configs/frr/vtysh.conf:/etc/frr/vtysh.conf
-          - ./configs/frr/frr-cfg.sh:/frr-cfg.sh
+          - ../configs/{{ node.name }}.conf:/etc/frr/frr.conf
+          - ../configs/frr/daemons:/etc/frr/daemons
+          - ../configs/frr/vtysh.conf:/etc/frr/vtysh.conf
+          - ../configs/frr/frr-cfg.sh:/frr-cfg.sh
         {% endif %}
         {% endif %}
       {% endfor %}

@@ -28,6 +28,7 @@ Thumbs.db
 /output/
 /cache/
 
+# Ignora i file di configurazione locali
 /configs/*.conf
 
 venv
