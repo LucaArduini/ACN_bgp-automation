@@ -8,6 +8,7 @@ topology:
         kind: linux
         
         
+        network-mode: none
         
         image: alpine:latest 
         env: 
@@ -27,6 +28,7 @@ topology:
         kind: linux
         
         
+        network-mode: none
         
         image: alpine:latest 
         env: 
@@ -46,9 +48,9 @@ topology:
         kind: linux
         
         
+        network-mode: none
         
         image: quay.io/frrouting/frr:10.4.1
-        network-mode: none
         binds:
           - ./configs/ce1.conf:/etc/frr/frr.conf
           - ./configs/frr/daemons:/etc/frr/daemons
@@ -62,9 +64,9 @@ topology:
         kind: linux
         
         
+        network-mode: none
         
         image: quay.io/frrouting/frr:10.4.1
-        network-mode: none
         binds:
           - ./configs/ce2.conf:/etc/frr/frr.conf
           - ./configs/frr/daemons:/etc/frr/daemons
@@ -78,9 +80,9 @@ topology:
         kind: linux
         
         
+        network-mode: none
         
         image: quay.io/frrouting/frr:10.4.1
-        network-mode: none
         binds:
           - ./configs/pe1.conf:/etc/frr/frr.conf
           - ./configs/frr/daemons:/etc/frr/daemons
@@ -94,9 +96,9 @@ topology:
         kind: linux
         
         
+        network-mode: none
         
         image: quay.io/frrouting/frr:10.4.1
-        network-mode: none
         binds:
           - ./configs/pe2.conf:/etc/frr/frr.conf
           - ./configs/frr/daemons:/etc/frr/daemons
@@ -110,9 +112,9 @@ topology:
         kind: linux
         
         
+        network-mode: none
         
         image: quay.io/frrouting/frr:10.4.1
-        network-mode: none
         binds:
           - ./configs/gw1.conf:/etc/frr/frr.conf
           - ./configs/frr/daemons:/etc/frr/daemons
@@ -126,9 +128,9 @@ topology:
         kind: linux
         
         
+        network-mode: none
         
         image: quay.io/frrouting/frr:10.4.1
-        network-mode: none
         binds:
           - ./configs/gw2.conf:/etc/frr/frr.conf
           - ./configs/frr/daemons:/etc/frr/daemons
@@ -142,9 +144,9 @@ topology:
         kind: linux
         
         
+        network-mode: none
         
         image: quay.io/frrouting/frr:10.4.1
-        network-mode: none
         binds:
           - ./configs/up1.conf:/etc/frr/frr.conf
           - ./configs/frr/daemons:/etc/frr/daemons
@@ -158,9 +160,9 @@ topology:
         kind: linux
         
         
+        network-mode: none
         
         image: quay.io/frrouting/frr:10.4.1
-        network-mode: none
         binds:
           - ./configs/up2.conf:/etc/frr/frr.conf
           - ./configs/frr/daemons:/etc/frr/daemons
@@ -174,9 +176,9 @@ topology:
         kind: linux
         
         
+        network-mode: none
         
         image: quay.io/frrouting/frr:10.4.1
-        network-mode: none
         binds:
           - ./configs/r3.conf:/etc/frr/frr.conf
           - ./configs/frr/daemons:/etc/frr/daemons
