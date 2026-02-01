@@ -48,7 +48,7 @@ topology:
         
         
         image: quay.io/frrouting/frr:10.4.1
-        startup-config: configs/ce1.conf
+        network-mode: none
         binds:
           - ./configs/ce1.conf:/etc/frr/frr.conf
           - ./configs/frr/daemons:/etc/frr/daemons
@@ -64,7 +64,7 @@ topology:
         
         
         image: quay.io/frrouting/frr:10.4.1
-        startup-config: configs/ce2.conf
+        network-mode: none
         binds:
           - ./configs/ce2.conf:/etc/frr/frr.conf
           - ./configs/frr/daemons:/etc/frr/daemons
@@ -80,7 +80,7 @@ topology:
         
         
         image: quay.io/frrouting/frr:10.4.1
-        startup-config: configs/pe1.conf
+        network-mode: none
         binds:
           - ./configs/pe1.conf:/etc/frr/frr.conf
           - ./configs/frr/daemons:/etc/frr/daemons
@@ -96,7 +96,7 @@ topology:
         
         
         image: quay.io/frrouting/frr:10.4.1
-        startup-config: configs/pe2.conf
+        network-mode: none
         binds:
           - ./configs/pe2.conf:/etc/frr/frr.conf
           - ./configs/frr/daemons:/etc/frr/daemons
@@ -112,7 +112,7 @@ topology:
         
         
         image: quay.io/frrouting/frr:10.4.1
-        startup-config: configs/gw1.conf
+        network-mode: none
         binds:
           - ./configs/gw1.conf:/etc/frr/frr.conf
           - ./configs/frr/daemons:/etc/frr/daemons
@@ -128,7 +128,7 @@ topology:
         
         
         image: quay.io/frrouting/frr:10.4.1
-        startup-config: configs/gw2.conf
+        network-mode: none
         binds:
           - ./configs/gw2.conf:/etc/frr/frr.conf
           - ./configs/frr/daemons:/etc/frr/daemons
@@ -144,7 +144,7 @@ topology:
         
         
         image: quay.io/frrouting/frr:10.4.1
-        startup-config: configs/up1.conf
+        network-mode: none
         binds:
           - ./configs/up1.conf:/etc/frr/frr.conf
           - ./configs/frr/daemons:/etc/frr/daemons
@@ -160,7 +160,7 @@ topology:
         
         
         image: quay.io/frrouting/frr:10.4.1
-        startup-config: configs/up2.conf
+        network-mode: none
         binds:
           - ./configs/up2.conf:/etc/frr/frr.conf
           - ./configs/frr/daemons:/etc/frr/daemons
@@ -176,7 +176,7 @@ topology:
         
         
         image: quay.io/frrouting/frr:10.4.1
-        startup-config: configs/r3.conf
+        network-mode: none
         binds:
           - ./configs/r3.conf:/etc/frr/frr.conf
           - ./configs/frr/daemons:/etc/frr/daemons
