@@ -1,31 +1,32 @@
 import os
 import sys
 import subprocess
-from paramiko import SSHClient, AutoAddPolicy
+from paramiko import SSHClient, AutoAddPolicy, RSAKey
 from scp import SCPClient
 from dotenv import load_dotenv
 
-# Carica le variabili dal file .env
 load_dotenv()
 
-# --- CONFIGURAZIONE ---
-# Legge la variabile d'ambiente. Se non esiste, restituisce None.
 REMOTE_HOST = os.getenv('REMOTE_HOST')
 
-# Controllo di sicurezza
+REMOTE_USER = os.getenv('REMOTE_USER')
+
+REMOTE_PASS = os.getenv('REMOTE_PASS')
+
 if not REMOTE_HOST:
     print("[-] Errore: La variabile REMOTE_HOST non è definita nel file .env")
     sys.exit(1)
+    
+if not REMOTE_USER:
+    print("[-] Errore: La variabile REMOTE_USER non è definita nel file .env")
+    sys.exit(1)
 
-REMOTE_USER = 'student'
-REMOTE_PASS = 'student'
-# Creiamo una cartella dedicata per mantenere l'ordine e far funzionare i path relativi
-REMOTE_PROJECT_ROOT = '/home/student/ACN_bgp-automation' 
 
-# Lista dei file/cartelle da copiare (percorsi relativi alla root del progetto)
+REMOTE_PROJECT_ROOT = f'/home/{REMOTE_USER}/ACN_bgp-automation' 
+
 FILES_TO_TRANSFER = [
     os.path.join("topology", "network.clab.yml"),
-    "configs",                       # Copia l'intera cartella
+    "configs",
     os.path.join("automation", "handle_traffic.py")
 ]
 
@@ -62,19 +63,14 @@ def upload_selected_files():
                     print(f"[!] Attenzione: Il file/cartella locale '{item}' non esiste. Salto.")
                     continue
 
-                # Calcola il percorso di destinazione remoto
-                # Esempio: topology/network.clab.yml -> /home/student/ACN_bgp-automation/topology/network.clab.yml
                 remote_dest_path = os.path.join(REMOTE_PROJECT_ROOT, item).replace("\\", "/")
                 
-                # Calcola la cartella genitore remota per creare la struttura se manca
                 remote_parent_dir = os.path.dirname(remote_dest_path)
                 
                 print(f"[*] Copia di '{item}' -> '{remote_dest_path}'")
                 
-                # Crea la cartella remota (mkdir -p) prima di copiare
                 ssh.exec_command(f"mkdir -p {remote_parent_dir}")
                 
-                # Esegue la copia (recursive=True gestisce automaticamente le cartelle come 'configs')
                 scp.put(item, remote_path=remote_dest_path, recursive=True)
                 
         print(f"\n[+] File trasferiti con successo in {REMOTE_PROJECT_ROOT}")
@@ -86,15 +82,13 @@ def upload_selected_files():
         ssh.close()
 
 def main():
-    # 1. Runnare build_topology.py
+ 
     topo_script = os.path.join("automation", "build_topology.py")
     run_script(topo_script)
 
-    # 2. Runnare build_configs.py
     config_script = os.path.join("automation", "build_configs.py")
     run_script(config_script)
 
-    # 3. Copiare file selettivi
     upload_selected_files()
 
     print("\n[ok] Deploy completato.")
