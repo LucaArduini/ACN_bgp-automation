@@ -55,7 +55,6 @@ topology:
           - ../configs/ce1.conf:/etc/frr/frr.conf
           - ../configs/frr/daemons:/etc/frr/daemons
           - ../configs/frr/vtysh.conf:/etc/frr/vtysh.conf
-          - ../configs/frr/frr-cfg.sh:/frr-cfg.sh
         
         
       
@@ -71,7 +70,6 @@ topology:
           - ../configs/ce2.conf:/etc/frr/frr.conf
           - ../configs/frr/daemons:/etc/frr/daemons
           - ../configs/frr/vtysh.conf:/etc/frr/vtysh.conf
-          - ../configs/frr/frr-cfg.sh:/frr-cfg.sh
         
         
       
@@ -87,7 +85,6 @@ topology:
           - ../configs/pe1.conf:/etc/frr/frr.conf
           - ../configs/frr/daemons:/etc/frr/daemons
           - ../configs/frr/vtysh.conf:/etc/frr/vtysh.conf
-          - ../configs/frr/frr-cfg.sh:/frr-cfg.sh
         
         
       
@@ -103,7 +100,6 @@ topology:
           - ../configs/pe2.conf:/etc/frr/frr.conf
           - ../configs/frr/daemons:/etc/frr/daemons
           - ../configs/frr/vtysh.conf:/etc/frr/vtysh.conf
-          - ../configs/frr/frr-cfg.sh:/frr-cfg.sh
         
         
       
@@ -119,7 +115,6 @@ topology:
           - ../configs/gw1.conf:/etc/frr/frr.conf
           - ../configs/frr/daemons:/etc/frr/daemons
           - ../configs/frr/vtysh.conf:/etc/frr/vtysh.conf
-          - ../configs/frr/frr-cfg.sh:/frr-cfg.sh
         
         
       
@@ -135,7 +130,6 @@ topology:
           - ../configs/gw2.conf:/etc/frr/frr.conf
           - ../configs/frr/daemons:/etc/frr/daemons
           - ../configs/frr/vtysh.conf:/etc/frr/vtysh.conf
-          - ../configs/frr/frr-cfg.sh:/frr-cfg.sh
         
         
       
@@ -151,7 +145,6 @@ topology:
           - ../configs/up1.conf:/etc/frr/frr.conf
           - ../configs/frr/daemons:/etc/frr/daemons
           - ../configs/frr/vtysh.conf:/etc/frr/vtysh.conf
-          - ../configs/frr/frr-cfg.sh:/frr-cfg.sh
         
         
       
@@ -167,7 +160,6 @@ topology:
           - ../configs/up2.conf:/etc/frr/frr.conf
           - ../configs/frr/daemons:/etc/frr/daemons
           - ../configs/frr/vtysh.conf:/etc/frr/vtysh.conf
-          - ../configs/frr/frr-cfg.sh:/frr-cfg.sh
         
         
       
@@ -183,7 +175,6 @@ topology:
           - ../configs/r3.conf:/etc/frr/frr.conf
           - ../configs/frr/daemons:/etc/frr/daemons
           - ../configs/frr/vtysh.conf:/etc/frr/vtysh.conf
-          - ../configs/frr/frr-cfg.sh:/frr-cfg.sh
         
         
       

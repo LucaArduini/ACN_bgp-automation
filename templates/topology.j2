@@ -28,7 +28,6 @@ topology:
           - ../configs/{{ node.name }}.conf:/etc/frr/frr.conf
           - ../configs/frr/daemons:/etc/frr/daemons
           - ../configs/frr/vtysh.conf:/etc/frr/vtysh.conf
-          - ../configs/frr/frr-cfg.sh:/frr-cfg.sh
         {% endif %}
         {% endif %}
       {% endfor %}
