@@ -24,6 +24,8 @@ venv/
 *.exe
 *.log
 *.bak
+*.asv
+*.pyc
 
 
 # EDITOR / IDE
@@ -37,3 +39,6 @@ venv/
 
 # CONFIGURAZIONI LOCALI
 /configs/*.conf
+
+# OUTPUT LOCALI
+.json
