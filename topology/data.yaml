@@ -88,6 +88,7 @@ nodes:
       - { name: eth1, ipv4_address: "172.30.1.2", ipv4_mask: /30 }
       - { name: eth2, ipv4_address: "10.4.1.1", ipv4_mask: /30 }
       - { name: eth3, ipv4_address: "10.3.1.1", ipv4_mask: /30 }
+      - { name: eth4, ipv4_address: "10.2.1.1", ipv4_mask: /30 }
 
   - name: up2
     role: up
@@ -99,8 +100,9 @@ nodes:
       - { name: eth1, ipv4_address: "172.30.2.2", ipv4_mask: /30 }
       - { name: eth2, ipv4_address: "10.4.2.1", ipv4_mask: /30 }
       - { name: eth3, ipv4_address: "10.3.2.1", ipv4_mask: /30 }
+      - { name: eth4, ipv4_address: "10.2.2.1", ipv4_mask: /30 }
 
-  - name: r3
+  - name: r1
     role: router
     bgp:
       asn: 65500
@@ -110,7 +112,7 @@ nodes:
       - { name: eth2, ipv4_address: "10.4.2.2", ipv4_mask: /30 }
       - { name: lo, ipv4_address: "8.8.8.8", ipv4_mask: /32 }
 
-  - name: r4
+  - name: r2
     role: router
     bgp:
       asn: 65501
@@ -119,6 +121,16 @@ nodes:
       - { name: eth1, ipv4_address: "10.3.1.2", ipv4_mask: /30 }
       - { name: eth2, ipv4_address: "10.3.2.2", ipv4_mask: /30 }
       - { name: lo, ipv4_address: "7.7.7.7", ipv4_mask: /32 }
+
+  - name: r3
+    role: router
+    bgp:
+      asn: 65502
+      router_id: 6.6.6.6
+    interfaces:
+      - { name: eth1, ipv4_address: "10.2.1.2", ipv4_mask: /30 }
+      - { name: eth2, ipv4_address: "10.2.2.2", ipv4_mask: /30 }
+      - { name: lo, ipv4_address: "6.6.6.6", ipv4_mask: /32 }
 
   - name: manager
     role: host
@@ -151,10 +163,13 @@ links:
   - { a: "gw1", a_port: "eth2", b: "up1", b_port: "eth1" }
   - { a: "gw2", a_port: "eth2", b: "up2", b_port: "eth1" }
 
-  - { a: "up1", a_port: "eth2", b: "r3", b_port: "eth1" }
-  - { a: "up2", a_port: "eth2", b: "r3", b_port: "eth2" }
+  - { a: "up1", a_port: "eth2", b: "r1", b_port: "eth1" }
+  - { a: "up2", a_port: "eth2", b: "r1", b_port: "eth2" }
 
-  - { a: "up1", a_port: "eth3", b: "r4", b_port: "eth1" }
-  - { a: "up2", a_port: "eth3", b: "r4", b_port: "eth2" }
+  - { a: "up1", a_port: "eth3", b: "r2", b_port: "eth1" }
+  - { a: "up2", a_port: "eth3", b: "r2", b_port: "eth2" }
+
+  - { a: "up1", a_port: "eth4", b: "r3", b_port: "eth1" }
+  - { a: "up2", a_port: "eth4", b: "r3", b_port: "eth2" }
 
   - { a: "manager", a_port: "eth1", b: "lan", b_port: "eth5"}

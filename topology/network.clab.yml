@@ -163,6 +163,36 @@ topology:
         
         
       
+      r1:
+        
+        kind: linux
+        
+        
+        network-mode: none
+        
+        image: quay.io/frrouting/frr:10.4.1
+        binds:
+          - ../configs/r1.conf:/etc/frr/frr.conf
+          - ../configs/frr/daemons:/etc/frr/daemons
+          - ../configs/frr/vtysh.conf:/etc/frr/vtysh.conf
+        
+        
+      
+      r2:
+        
+        kind: linux
+        
+        
+        network-mode: none
+        
+        image: quay.io/frrouting/frr:10.4.1
+        binds:
+          - ../configs/r2.conf:/etc/frr/frr.conf
+          - ../configs/frr/daemons:/etc/frr/daemons
+          - ../configs/frr/vtysh.conf:/etc/frr/vtysh.conf
+        
+        
+      
       r3:
         
         kind: linux
@@ -173,21 +203,6 @@ topology:
         image: quay.io/frrouting/frr:10.4.1
         binds:
           - ../configs/r3.conf:/etc/frr/frr.conf
-          - ../configs/frr/daemons:/etc/frr/daemons
-          - ../configs/frr/vtysh.conf:/etc/frr/vtysh.conf
-        
-        
-      
-      r4:
-        
-        kind: linux
-        
-        
-        network-mode: none
-        
-        image: quay.io/frrouting/frr:10.4.1
-        binds:
-          - ../configs/r4.conf:/etc/frr/frr.conf
           - ../configs/frr/daemons:/etc/frr/daemons
           - ../configs/frr/vtysh.conf:/etc/frr/vtysh.conf
         
@@ -246,13 +261,17 @@ topology:
       
           - endpoints: ["gw2:eth2", "up2:eth1"]
       
-          - endpoints: ["up1:eth2", "r3:eth1"]
+          - endpoints: ["up1:eth2", "r1:eth1"]
       
-          - endpoints: ["up2:eth2", "r3:eth2"]
+          - endpoints: ["up2:eth2", "r1:eth2"]
       
-          - endpoints: ["up1:eth3", "r4:eth1"]
+          - endpoints: ["up1:eth3", "r2:eth1"]
       
-          - endpoints: ["up2:eth3", "r4:eth2"]
+          - endpoints: ["up2:eth3", "r2:eth2"]
+      
+          - endpoints: ["up1:eth4", "r3:eth1"]
+      
+          - endpoints: ["up2:eth4", "r3:eth2"]
       
           - endpoints: ["manager:eth1", "lan:eth5"]
       
@@ -321,14 +340,21 @@ topology:
         
           - type: dummy
             endpoint:
-              node: r3
+              node: r1
               interface: lo0
         
       
         
           - type: dummy
             endpoint:
-              node: r4
+              node: r2
+              interface: lo0
+        
+      
+        
+          - type: dummy
+            endpoint:
+              node: r3
               interface: lo0
         
       
