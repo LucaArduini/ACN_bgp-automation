@@ -27,7 +27,9 @@ REMOTE_PROJECT_ROOT = f'/home/{REMOTE_USER}/ACN_bgp-automation'
 FILES_TO_TRANSFER = [
     os.path.join("topology", "network.clab.yml"),
     "configs",
-    os.path.join("automation", "handle_traffic.py")
+    os.path.join("automation", "handle_traffic.py"),
+    "bootstrap.sh",
+    "teardown.sh"
 ]
 
 def run_script(script_path):
@@ -48,7 +50,7 @@ def run_script(script_path):
         sys.exit(1)
 
 def upload_selected_files():
-    """Copia solo i file specificati mantenendo la struttura delle directory"""
+    """Copia solo i file specificati mantenendo la struttura delle directory e imposta i permessi"""
     print(f"[*] Connessione a {REMOTE_USER}@{REMOTE_HOST}...")
     
     ssh = SSHClient()
@@ -63,16 +65,43 @@ def upload_selected_files():
                     print(f"[!] Attenzione: Il file/cartella locale '{item}' non esiste. Salto.")
                     continue
 
-                remote_dest_path = os.path.join(REMOTE_PROJECT_ROOT, item).replace("\\", "/")
+                # Normalizza i percorsi per Linux (forward slash)
+                item_linux = item.replace("\\", "/")
                 
-                remote_parent_dir = os.path.dirname(remote_dest_path)
+                # Calcola il percorso remoto
+                if os.path.isdir(item):
+                    parent_dir = os.path.dirname(item_linux) 
+                    remote_dest_path = os.path.join(REMOTE_PROJECT_ROOT, parent_dir).replace("\\", "/")
+                else:
+                    remote_dest_path = os.path.join(REMOTE_PROJECT_ROOT, item_linux).replace("\\", "/")
+                
+                if os.path.isdir(item):
+                    remote_parent_mkdir = remote_dest_path
+                else:
+                    remote_parent_mkdir = os.path.dirname(remote_dest_path)
                 
                 print(f"[*] Copia di '{item}' -> '{remote_dest_path}'")
                 
-                ssh.exec_command(f"mkdir -p {remote_parent_dir}")
+                ssh.exec_command(f"mkdir -p {remote_parent_mkdir}")
                 
-                scp.put(item, remote_path=remote_dest_path, recursive=True)
-                
+                scp.put(item, remote_path=remote_dest_path, recursive=True, preserve_times=True)
+        
+        # --- AGGIUNTA: CAMBIO PERMESSI ---
+        print(f"[*] Imposto i permessi (777) su {REMOTE_PROJECT_ROOT}...")
+        
+        # Esegue chmod -R 777 su tutta la cartella del progetto remoto
+        # -R: Ricorsivo (tutti i file e sottocartelle)
+        # 777: Lettura/Scrittura/Esecuzione per tutti
+        stdin, stdout, stderr = ssh.exec_command(f"chmod -R 777 {REMOTE_PROJECT_ROOT}")
+        
+        # Attendiamo che il comando finisca e controlliamo errori
+        exit_status = stdout.channel.recv_exit_status()
+        if exit_status == 0:
+            print(f"[+] Permessi aggiornati con successo.")
+        else:
+            print(f"[-] Errore nel cambio permessi: {stderr.read().decode()}")
+        # ---------------------------------
+
         print(f"\n[+] File trasferiti con successo in {REMOTE_PROJECT_ROOT}")
         
     except Exception as e:

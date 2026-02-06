@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 ip link add mgmt type vrf table 1001
 ip link set mgmt up
 ip link set eth0 master mgmt
