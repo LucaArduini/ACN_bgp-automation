@@ -1,15 +1,19 @@
-
+# ==============================
 # SISTEMA OPERATIVO
+# ==============================
 .DS_Store
 Thumbs.db
 
-
-# AMBIENTI VIRTUALI / ENV
+# ==============================
+# AMBIENTI VIRTUALI E VARIABILI D’AMBIENTE
+# ==============================
 venv/
 .env
 
-
-# CARTELLE DI BUILD / OUTPUT
+# ==============================
+# FILE DI BUILD E COMPILAZIONE
+# ==============================
+# Cartelle di output
 /build/
 /bin/
 /obj/
@@ -17,8 +21,7 @@ venv/
 /temp/
 /cache/
 
-
-# FILE TEMPORANEI DI COMPILAZIONE
+# File temporanei e compilati
 *.o
 *.obj
 *.exe
@@ -27,21 +30,28 @@ venv/
 *.asv
 *.pyc
 
-
-# EDITOR / IDE
+# ==============================
+# EDITOR E IDE
+# ==============================
 .vscode/
 
-
+# ==============================
 # LIBRERIE ESTERNE LOCALI
+# ==============================
 /external/
 /libs/
 
-
+# ==============================
 # CONFIGURAZIONI LOCALI
+# ==============================
 /configs/*.conf
-.gitattributes
+
+# ==============================
+# SCRIPT LOCALI / UTILITY
+# ==============================
 normalize_lf.py
 
-
-# OUTPUT LOCALI
+# ==============================
+# FILE DI OUTPUT LOCALI
+# ==============================
 *.json
