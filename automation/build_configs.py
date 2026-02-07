@@ -102,6 +102,6 @@ for node in nodes:
         networks=list(bgp_networks)
     )
     
-    with open(os.path.join(OUTPUT_DIR, f"{hostname}.conf"), "w") as f:
+    with open(os.path.join(OUTPUT_DIR, f"{hostname}.conf"), "w", newline='\n') as f:
         f.write(config)
     print(f"Generata config per {hostname}")

@@ -112,7 +112,7 @@ validate_data(data)
 
 # --- GENERAZIONE FILE ---
 content = template.render(nodes=data['nodes'], links=data['links'])
-with open(output_path, 'w') as f:
+with open(output_path, 'w', newline='\n') as f:
     f.write(content)
 
 print("Container lab network yaml file generated!")

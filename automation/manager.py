@@ -77,7 +77,7 @@ def manage_pipeline():
         # Reshape del vettore 1D in matrice 2D (uguale alla matrice di traffico)
         decision_matrix = vettore_ottimo.reshape((num_src, num_dst))
         
-        print(f"{Colors.UNDERLINE}{'FLUSSO (Sorg -> Dest)':<30} | {'TRAFFICO':<10} | {'PE ASSEGNATO'}{Colors.ENDC}")
+        print(f"{Colors.UNDERLINE}{'FLUSSO (Sorg -> Dest)':<28} | {'TRAFFICO':<10} | {'PE ASSEGNATO'}{Colors.ENDC}")
         
         total_pe1 = 0
         total_pe2 = 0

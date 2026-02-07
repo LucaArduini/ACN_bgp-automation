@@ -136,7 +136,7 @@ def save_to_json(source_routers, pe_routers, destinations_routers, matrix):
     }
 
     try:
-        with open(JSON_FILE, "w") as f:
+        with open(JSON_FILE, "w", newline='\n') as f:
             json.dump(output_data, f, indent=4)
         print(f"\n[OK] Traffic matrix saved to: {JSON_FILE}")
     except Exception as e:

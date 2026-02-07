@@ -25,7 +25,7 @@ if not REMOTE_USER:
 REMOTE_PROJECT_ROOT = f'/home/{REMOTE_USER}/ACN_bgp-automation' 
 
 FILES_TO_TRANSFER = [
-    os.path.join("topology", "network.clab.yml"),
+    "topology",
     "configs",
     os.path.join("automation", "handle_traffic.py"),
     "bootstrap.sh",
@@ -87,12 +87,12 @@ def upload_selected_files():
                 scp.put(item, remote_path=remote_dest_path, recursive=True, preserve_times=True)
         
         # --- AGGIUNTA: CAMBIO PERMESSI ---
-        print(f"[*] Imposto i permessi (777) su {REMOTE_PROJECT_ROOT}...")
+        print(f"[*] Imposto i permessi (755) su {REMOTE_PROJECT_ROOT}...")
         
-        # Esegue chmod -R 777 su tutta la cartella del progetto remoto
+        # Esegue chmod -R 755 su tutta la cartella del progetto remoto
         # -R: Ricorsivo (tutti i file e sottocartelle)
-        # 777: Lettura/Scrittura/Esecuzione per tutti
-        stdin, stdout, stderr = ssh.exec_command(f"chmod -R 777 {REMOTE_PROJECT_ROOT}")
+        # 755: Lettura ed esecuzione per tutti, scrittura solo per il proprietario
+        stdin, stdout, stderr = ssh.exec_command(f"chmod -R 755 {REMOTE_PROJECT_ROOT}")
         
         # Attendiamo che il comando finisca e controlliamo errori
         exit_status = stdout.channel.recv_exit_status()

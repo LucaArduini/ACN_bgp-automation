@@ -39,6 +39,9 @@ venv/
 
 # CONFIGURAZIONI LOCALI
 /configs/*.conf
+.gitattributes
+normalize_lf.py
+
 
 # OUTPUT LOCALI
-.json
+*.json
