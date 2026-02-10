@@ -160,8 +160,8 @@ links:
   - { a: "gw1", a_port: "eth3", b: "lan", b_port: "eth3" }
   - { a: "gw2", a_port: "eth3", b: "lan", b_port: "eth4" }
 
-  - { a: "gw1", a_port: "eth2", b: "up1", b_port: "eth1" }
-  - { a: "gw2", a_port: "eth2", b: "up2", b_port: "eth1" }
+  - { a: "gw1", a_port: "eth2", b: "up1", b_port: "eth1", capacity: 1000 }
+  - { a: "gw2", a_port: "eth2", b: "up2", b_port: "eth1", capacity: 1000 }
 
   - { a: "up1", a_port: "eth2", b: "r1", b_port: "eth1" }
   - { a: "up2", a_port: "eth2", b: "r1", b_port: "eth2" }

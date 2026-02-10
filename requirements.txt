@@ -3,3 +3,5 @@ pyyaml==6.0.3
 paramiko
 scp
 python-dotenv
+numpy
+scipy

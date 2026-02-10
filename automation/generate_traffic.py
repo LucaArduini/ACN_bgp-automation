@@ -88,7 +88,7 @@ def print_matrix(source_routers, destinations_routers, matrix):
     """Prints the matrix in a readable table format."""
     
     # Table Header
-    header = f"{'Source \\ Destination':<20} | " + " | ".join([f"{d:>8}" for d in destinations_routers])
+    header = f"{'Source / Destination':<20} | " + " | ".join([f"{d:>8}" for d in destinations_routers])
     separator = "-" * len(header)
     
     print("\n" + separator)
