@@ -2,368 +2,200 @@ name: project
 
 topology:
     nodes:
-      
-      n1:
-        
-        kind: linux
-        
-        
-        network-mode: none
-        
-        image: alpine:latest 
-        env: 
-          MY_INTF: eth1
-          MY_IP: 198.51.100.3/24
-          MY_GW: 198.51.100.1
-        binds:  
-        - ../configs/linux-host-cfg.sh:/linux-cfg.sh
-        exec: 
-          - echo "script on n1"
-          - sh /linux-cfg.sh 
-        
-        
-      
-      n2:
-        
-        kind: linux
-        
-        
-        network-mode: none
-        
-        image: alpine:latest 
-        env: 
-          MY_INTF: eth1
-          MY_IP: 192.0.0.3/24
-          MY_GW: 192.0.0.2
-        binds:  
-        - ../configs/linux-host-cfg.sh:/linux-cfg.sh
-        exec: 
-          - echo "script on n2"
-          - sh /linux-cfg.sh 
-        
-        
-      
-      ce1:
-        
-        kind: linux
-        
-        
-        network-mode: none
-        
-        image: quay.io/frrouting/frr:10.4.1
-        binds:
-          - ../configs/ce1.conf:/etc/frr/frr.conf
-          - ../configs/frr/daemons:/etc/frr/daemons
-          - ../configs/frr/vtysh.conf:/etc/frr/vtysh.conf
-        
-        
-      
-      ce2:
-        
-        kind: linux
-        
-        
-        network-mode: none
-        
-        image: quay.io/frrouting/frr:10.4.1
-        binds:
-          - ../configs/ce2.conf:/etc/frr/frr.conf
-          - ../configs/frr/daemons:/etc/frr/daemons
-          - ../configs/frr/vtysh.conf:/etc/frr/vtysh.conf
-        
-        
-      
-      pe1:
-        
-        kind: linux
-        
-        
-        network-mode: none
-        
-        image: quay.io/frrouting/frr:10.4.1
-        binds:
-          - ../configs/pe1.conf:/etc/frr/frr.conf
-          - ../configs/frr/daemons:/etc/frr/daemons
-          - ../configs/frr/vtysh.conf:/etc/frr/vtysh.conf
-        
-        
-      
-      pe2:
-        
-        kind: linux
-        
-        
-        network-mode: none
-        
-        image: quay.io/frrouting/frr:10.4.1
-        binds:
-          - ../configs/pe2.conf:/etc/frr/frr.conf
-          - ../configs/frr/daemons:/etc/frr/daemons
-          - ../configs/frr/vtysh.conf:/etc/frr/vtysh.conf
-        
-        
-      
-      gw1:
-        
-        kind: linux
-        
-        
-        network-mode: none
-        
-        image: quay.io/frrouting/frr:10.4.1
-        binds:
-          - ../configs/gw1.conf:/etc/frr/frr.conf
-          - ../configs/frr/daemons:/etc/frr/daemons
-          - ../configs/frr/vtysh.conf:/etc/frr/vtysh.conf
-        
-        
-      
-      gw2:
-        
-        kind: linux
-        
-        
-        network-mode: none
-        
-        image: quay.io/frrouting/frr:10.4.1
-        binds:
-          - ../configs/gw2.conf:/etc/frr/frr.conf
-          - ../configs/frr/daemons:/etc/frr/daemons
-          - ../configs/frr/vtysh.conf:/etc/frr/vtysh.conf
-        
-        
-      
-      up1:
-        
-        kind: linux
-        
-        
-        network-mode: none
-        
-        image: quay.io/frrouting/frr:10.4.1
-        binds:
-          - ../configs/up1.conf:/etc/frr/frr.conf
-          - ../configs/frr/daemons:/etc/frr/daemons
-          - ../configs/frr/vtysh.conf:/etc/frr/vtysh.conf
-        
-        
-      
-      up2:
-        
-        kind: linux
-        
-        
-        network-mode: none
-        
-        image: quay.io/frrouting/frr:10.4.1
-        binds:
-          - ../configs/up2.conf:/etc/frr/frr.conf
-          - ../configs/frr/daemons:/etc/frr/daemons
-          - ../configs/frr/vtysh.conf:/etc/frr/vtysh.conf
-        
-        
-      
-      r1:
-        
-        kind: linux
-        
-        
-        network-mode: none
-        
-        image: quay.io/frrouting/frr:10.4.1
-        binds:
-          - ../configs/r1.conf:/etc/frr/frr.conf
-          - ../configs/frr/daemons:/etc/frr/daemons
-          - ../configs/frr/vtysh.conf:/etc/frr/vtysh.conf
-        
-        
-      
-      r2:
-        
-        kind: linux
-        
-        
-        network-mode: none
-        
-        image: quay.io/frrouting/frr:10.4.1
-        binds:
-          - ../configs/r2.conf:/etc/frr/frr.conf
-          - ../configs/frr/daemons:/etc/frr/daemons
-          - ../configs/frr/vtysh.conf:/etc/frr/vtysh.conf
-        
-        
-      
-      r3:
-        
-        kind: linux
-        
-        
-        network-mode: none
-        
-        image: quay.io/frrouting/frr:10.4.1
-        binds:
-          - ../configs/r3.conf:/etc/frr/frr.conf
-          - ../configs/frr/daemons:/etc/frr/daemons
-          - ../configs/frr/vtysh.conf:/etc/frr/vtysh.conf
-        
-        
-      
-      manager:
-        
-        kind: linux
-        
-        
-        network-mode: none
-        
-        image: alpine:latest 
-        env: 
-          MY_INTF: lo
-          MY_IP: /24
-          MY_GW: 192.168.12.1
-        binds:  
-        - ../configs/linux-host-cfg.sh:/linux-cfg.sh
-        exec: 
-          - echo "script on manager"
-          - sh /linux-cfg.sh 
-        
-        
-      
-      lan:
-        
-        kind: bridge
-        
-        
-      
+        n1:
+            kind: linux
+            network-mode: none
+            image: alpine:latest 
+            env: 
+                MY_INTF: eth1
+                MY_IP: 198.51.100.3/24
+                MY_GW: 198.51.100.1
+            binds:  
+                - ../configs/linux-host-cfg.sh:/linux-cfg.sh
+            exec: 
+                - echo "script on n1"
+                - sh /linux-cfg.sh 
+        n2:
+            kind: linux
+            network-mode: none
+            image: alpine:latest 
+            env: 
+                MY_INTF: eth1
+                MY_IP: 192.0.0.3/24
+                MY_GW: 192.0.0.2
+            binds:  
+                - ../configs/linux-host-cfg.sh:/linux-cfg.sh
+            exec: 
+                - echo "script on n2"
+                - sh /linux-cfg.sh 
+        ce1:
+            kind: linux
+            network-mode: none
+            image: quay.io/frrouting/frr:10.4.1
+            binds:
+                - ../configs/ce1.conf:/etc/frr/frr.conf
+                - ../configs/frr/daemons:/etc/frr/daemons
+                - ../configs/frr/vtysh.conf:/etc/frr/vtysh.conf
+        ce2:
+            kind: linux
+            network-mode: none
+            image: quay.io/frrouting/frr:10.4.1
+            binds:
+                - ../configs/ce2.conf:/etc/frr/frr.conf
+                - ../configs/frr/daemons:/etc/frr/daemons
+                - ../configs/frr/vtysh.conf:/etc/frr/vtysh.conf
+        pe1:
+            kind: linux
+            network-mode: none
+            image: quay.io/frrouting/frr:10.4.1
+            binds:
+                - ../configs/pe1.conf:/etc/frr/frr.conf
+                - ../configs/frr/daemons:/etc/frr/daemons
+                - ../configs/frr/vtysh.conf:/etc/frr/vtysh.conf
+        pe2:
+            kind: linux
+            network-mode: none
+            image: quay.io/frrouting/frr:10.4.1
+            binds:
+                - ../configs/pe2.conf:/etc/frr/frr.conf
+                - ../configs/frr/daemons:/etc/frr/daemons
+                - ../configs/frr/vtysh.conf:/etc/frr/vtysh.conf
+        gw1:
+            kind: linux
+            network-mode: none
+            image: quay.io/frrouting/frr:10.4.1
+            binds:
+                - ../configs/gw1.conf:/etc/frr/frr.conf
+                - ../configs/frr/daemons:/etc/frr/daemons
+                - ../configs/frr/vtysh.conf:/etc/frr/vtysh.conf
+        gw2:
+            kind: linux
+            network-mode: none
+            image: quay.io/frrouting/frr:10.4.1
+            binds:
+                - ../configs/gw2.conf:/etc/frr/frr.conf
+                - ../configs/frr/daemons:/etc/frr/daemons
+                - ../configs/frr/vtysh.conf:/etc/frr/vtysh.conf
+        up1:
+            kind: linux
+            network-mode: none
+            image: quay.io/frrouting/frr:10.4.1
+            binds:
+                - ../configs/up1.conf:/etc/frr/frr.conf
+                - ../configs/frr/daemons:/etc/frr/daemons
+                - ../configs/frr/vtysh.conf:/etc/frr/vtysh.conf
+        up2:
+            kind: linux
+            network-mode: none
+            image: quay.io/frrouting/frr:10.4.1
+            binds:
+                - ../configs/up2.conf:/etc/frr/frr.conf
+                - ../configs/frr/daemons:/etc/frr/daemons
+                - ../configs/frr/vtysh.conf:/etc/frr/vtysh.conf
+        r1:
+            kind: linux
+            network-mode: none
+            image: quay.io/frrouting/frr:10.4.1
+            binds:
+                - ../configs/r1.conf:/etc/frr/frr.conf
+                - ../configs/frr/daemons:/etc/frr/daemons
+                - ../configs/frr/vtysh.conf:/etc/frr/vtysh.conf
+        r2:
+            kind: linux
+            network-mode: none
+            image: quay.io/frrouting/frr:10.4.1
+            binds:
+                - ../configs/r2.conf:/etc/frr/frr.conf
+                - ../configs/frr/daemons:/etc/frr/daemons
+                - ../configs/frr/vtysh.conf:/etc/frr/vtysh.conf
+        r3:
+            kind: linux
+            network-mode: none
+            image: quay.io/frrouting/frr:10.4.1
+            binds:
+                - ../configs/r3.conf:/etc/frr/frr.conf
+                - ../configs/frr/daemons:/etc/frr/daemons
+                - ../configs/frr/vtysh.conf:/etc/frr/vtysh.conf
+        manager:
+            kind: linux
+            network-mode: none
+            image: acn-manager:latest
+            env: 
+                MY_INTF: eth1
+                MY_IP: 192.168.12.5/24
+                MY_GW: 192.168.12.1
+            binds:  
+                - ../configs/linux-host-cfg.sh:/linux-cfg.sh
+                - ../automation:/root/automation
+                - ./data.yaml:/root/topology/data.yaml
+            exec:
+                - sh /linux-cfg.sh 
+                - echo "Manager pronto con Python, Numpy e Scipy"
+        lan:
+            kind: bridge
 
     links:
-      
-          - endpoints: ["n1:eth1", "ce1:eth3"]
-      
-          - endpoints: ["n2:eth1", "ce2:eth3"]
-      
-          - endpoints: ["ce1:eth1", "pe1:eth1"]
-      
-          - endpoints: ["ce1:eth2", "pe2:eth1"]
-      
-          - endpoints: ["ce2:eth1", "pe1:eth3"]
-      
-          - endpoints: ["ce2:eth2", "pe2:eth3"]
-      
-          - endpoints: ["pe1:eth4", "lan:eth1"]
-      
-          - endpoints: ["pe2:eth4", "lan:eth2"]
-      
-          - endpoints: ["gw1:eth3", "lan:eth3"]
-      
-          - endpoints: ["gw2:eth3", "lan:eth4"]
-      
-          - endpoints: ["gw1:eth2", "up1:eth1"]
-      
-          - endpoints: ["gw2:eth2", "up2:eth1"]
-      
-          - endpoints: ["up1:eth2", "r1:eth1"]
-      
-          - endpoints: ["up2:eth2", "r1:eth2"]
-      
-          - endpoints: ["up1:eth3", "r2:eth1"]
-      
-          - endpoints: ["up2:eth3", "r2:eth2"]
-      
-          - endpoints: ["up1:eth4", "r3:eth1"]
-      
-          - endpoints: ["up2:eth4", "r3:eth2"]
-      
-          - endpoints: ["manager:eth1", "lan:eth5"]
-      
+        - endpoints: ["n1:eth1", "ce1:eth3"]
+        - endpoints: ["n2:eth1", "ce2:eth3"]
+        - endpoints: ["ce1:eth1", "pe1:eth1"]
+        - endpoints: ["ce1:eth2", "pe2:eth1"]
+        - endpoints: ["ce2:eth1", "pe1:eth3"]
+        - endpoints: ["ce2:eth2", "pe2:eth3"]
+        - endpoints: ["pe1:eth4", "lan:eth1"]
+        - endpoints: ["pe2:eth4", "lan:eth2"]
+        - endpoints: ["gw1:eth3", "lan:eth3"]
+        - endpoints: ["gw2:eth3", "lan:eth4"]
+        - endpoints: ["gw1:eth2", "up1:eth1"]
+        - endpoints: ["gw2:eth2", "up2:eth1"]
+        - endpoints: ["up1:eth2", "r1:eth1"]
+        - endpoints: ["up2:eth2", "r1:eth2"]
+        - endpoints: ["up1:eth3", "r2:eth1"]
+        - endpoints: ["up2:eth3", "r2:eth2"]
+        - endpoints: ["up1:eth4", "r3:eth1"]
+        - endpoints: ["up2:eth4", "r3:eth2"]
+        - endpoints: ["manager:eth1", "lan:eth5"]
 
-      
-        
-      
-        
-      
-        
-          - type: dummy
-            endpoint:
-              node: ce1
-              interface: lo0
-        
-      
-        
-          - type: dummy
-            endpoint:
-              node: ce2
-              interface: lo0
-        
-      
-        
-          - type: dummy
-            endpoint:
-              node: pe1
-              interface: lo0
-        
-      
-        
-          - type: dummy
-            endpoint:
-              node: pe2
-              interface: lo0
-        
-      
-        
-          - type: dummy
-            endpoint:
-              node: gw1
-              interface: lo0
-        
-      
-        
-          - type: dummy
-            endpoint:
-              node: gw2
-              interface: lo0
-        
-      
-        
-          - type: dummy
-            endpoint:
-              node: up1
-              interface: lo0
-        
-      
-        
-          - type: dummy
-            endpoint:
-              node: up2
-              interface: lo0
-        
-      
-        
-          - type: dummy
-            endpoint:
-              node: r1
-              interface: lo0
-        
-      
-        
-          - type: dummy
-            endpoint:
-              node: r2
-              interface: lo0
-        
-      
-        
-          - type: dummy
-            endpoint:
-              node: r3
-              interface: lo0
-        
-      
-        
-      
-        
-          - type: dummy
-            endpoint:
-              node: lan
-              interface: lo0
-        
-      
+        - type: dummy
+          endpoint:
+            node: ce1
+            interface: lo0
+        - type: dummy
+          endpoint:
+            node: ce2
+            interface: lo0
+        - type: dummy
+          endpoint:
+            node: pe1
+            interface: lo0
+        - type: dummy
+          endpoint:
+            node: pe2
+            interface: lo0
+        - type: dummy
+          endpoint:
+            node: gw1
+            interface: lo0
+        - type: dummy
+          endpoint:
+            node: gw2
+            interface: lo0
+        - type: dummy
+          endpoint:
+            node: up1
+            interface: lo0
+        - type: dummy
+          endpoint:
+            node: up2
+            interface: lo0
+        - type: dummy
+          endpoint:
+            node: r1
+            interface: lo0
+        - type: dummy
+          endpoint:
+            node: r2
+            interface: lo0
+        - type: dummy
+          endpoint:
+            node: r3
+            interface: lo0

@@ -99,7 +99,9 @@ output_path = os.path.join(TOPOLOGY_DIR, "network.clab.yml")
 
 # --- SETUP JINJA2 ---
 environment = Environment(
-    loader=FileSystemLoader(TEMPLATES_DIR)
+    loader=FileSystemLoader(TEMPLATES_DIR),
+    trim_blocks=True,      # Rimuove il primo newline dopo un blocco {% %}
+    lstrip_blocks=True     # Rimuove tab/spazi prima di un blocco {% %}
 )
 template = environment.get_template("topology.j2")
 

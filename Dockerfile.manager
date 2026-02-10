@@ -1,0 +1,16 @@
+# Usa Alpine come base
+FROM alpine:latest
+
+# Installa Python e le librerie necessarie (l'installazione avviene ora sul tuo PC)
+RUN apk add --no-cache \
+    python3 \
+    py3-pip \
+    py3-numpy \
+    py3-scipy \
+    py3-yaml \
+    bash \
+    iproute2 \
+    docker-cli
+
+# Imposta la directory di lavoro
+WORKDIR /root

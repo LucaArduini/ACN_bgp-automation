@@ -51,9 +51,19 @@ else
     exit 1
 fi
 
-# 3. DEPLOY DELLA TOPOLOGIA DI RETE (CONTAINERLAB)
-echo -e "\n$INFO Avvio del deployment della topologia di rete..."
+# 3. COSTRUZIONE IMMAGINE MANAGER
+echo -e "\n[INFO] Costruzione immagine Docker per il Manager..."
+if sudo docker build -t acn-manager:latest -f Dockerfile.manager .; then
+     echo -e "[OK] Immagine acn-manager costruita con successo."
+else
+     echo -e "[ERROR] Fallimento durante la costruzione dell'immagine Docker."
+     exit 1
+fi
+
+# 4. DEPLOY DELLA TOPOLOGIA DI RETE (CONTAINERLAB)
+echo -e "\n[INFO] Avvio del deployment della topologia di rete..."
 if [ -f "$TOPOLOGY_SPEC" ]; then
+    # Usiamo l'immagine locale appena costruita e i file già presenti
     if sudo containerlab deploy -t "$TOPOLOGY_SPEC" --reconfigure; then
          echo -e "\n======================================================"
          echo -e "   $SUCCESS INFRASTRUTTURA DISTRIBUITA CON SUCCESSO"

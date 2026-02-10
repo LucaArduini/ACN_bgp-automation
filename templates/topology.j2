@@ -2,46 +2,60 @@ name: project
 
 topology:
     nodes:
-      {% for node in nodes %}
-      {{ node.name }}:
-        {% if node.kind %}
-        kind: {{ node.kind }}
-        {% else %}
-        kind: linux
-        {% endif %}
-        {% if node.kind != 'bridge' %}
-        network-mode: none
-        {% if node.role == 'host' %}
-        image: alpine:latest 
-        env: 
-          MY_INTF: {{ node.interfaces[0].name }}
-          MY_IP: {{ node.ipv4_address }}/24
-          MY_GW: {{ node.gateway_ip }}
-        binds:  
-        - ../configs/linux-host-cfg.sh:/linux-cfg.sh
-        exec: 
-          - echo "script on {{ node.name }}"
-          - sh /linux-cfg.sh 
-        {% else %}
-        image: quay.io/frrouting/frr:10.4.1
-        binds:
-          - ../configs/{{ node.name }}.conf:/etc/frr/frr.conf
-          - ../configs/frr/daemons:/etc/frr/daemons
-          - ../configs/frr/vtysh.conf:/etc/frr/vtysh.conf
-        {% endif %}
-        {% endif %}
-      {% endfor %}
+        {% for node in nodes %}
+        {{ node.name }}:
+            {% if node.kind %}
+            kind: {{ node.kind }}
+            {% else %}
+            kind: linux
+            {% endif %}
+            {% if node.kind != 'bridge' %}
+            network-mode: none
+            {% if node.name == 'manager' %}
+            image: acn-manager:latest
+            env: 
+                MY_INTF: eth1
+                MY_IP: {{ node.interfaces[1].ipv4_address }}/24
+                MY_GW: {{ node.gateway_ip }}
+            binds:  
+                - ../configs/linux-host-cfg.sh:/linux-cfg.sh
+                - ../automation:/root/automation
+                - ./data.yaml:/root/topology/data.yaml
+                - /var/run/docker.sock:/var/run/docker.sock
+            exec:
+                - sh /linux-cfg.sh 
+                - echo "Manager pronto con Python, Numpy e Scipy"
+            {% elif node.role == 'host' %}
+            image: alpine:latest 
+            env: 
+                MY_INTF: {{ node.interfaces[0].name }}
+                MY_IP: {{ node.ipv4_address }}/24
+                MY_GW: {{ node.gateway_ip }}
+            binds:  
+                - ../configs/linux-host-cfg.sh:/linux-cfg.sh
+            exec: 
+                - echo "script on {{ node.name }}"
+                - sh /linux-cfg.sh 
+            {% else %}
+            image: quay.io/frrouting/frr:10.4.1
+            binds:
+                - ../configs/{{ node.name }}.conf:/etc/frr/frr.conf
+                - ../configs/frr/daemons:/etc/frr/daemons
+                - ../configs/frr/vtysh.conf:/etc/frr/vtysh.conf
+            {% endif %}
+            {% endif %}
+        {% endfor %}
 
     links:
-      {% for link in links %}
-          - endpoints: ["{{ link.a }}:{{ link.a_port }}", "{{ link.b }}:{{ link.b_port }}"]
-      {% endfor %}
+        {% for link in links %}
+        - endpoints: ["{{ link.a }}:{{ link.a_port }}", "{{ link.b }}:{{ link.b_port }}"]
+        {% endfor %}
 
-      {% for node in nodes %}
-        {% if node.role != 'host' %}
-          - type: dummy
-            endpoint:
-              node: {{ node.name }}
-              interface: lo0
+        {% for node in nodes %}
+        {% if node.role != 'host' and node.kind != 'bridge' %}
+        - type: dummy
+          endpoint:
+            node: {{ node.name }}
+            interface: lo0
         {% endif %}
-      {% endfor %}
+        {% endfor %}
