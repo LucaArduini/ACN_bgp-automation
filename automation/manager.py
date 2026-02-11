@@ -5,7 +5,7 @@ import sys
 import yaml
 import numpy as np
 
-from handle_traffic import set_med
+from handle_traffic import set_med, set_local_pref
 
 # Impostiamo il path per trovare i moduli locali
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -102,20 +102,19 @@ def manage_pipeline():
             elif choice == 2: agg_matrix[1][j] += vol
 
     default_med = 100
-
-    seq = 10
+    seq_med = 10
 
     for i, src in enumerate(sources):
         for j, dst in enumerate(destinations):
             other_choice = 1 if dec_matrix_ce_pe[i][j] == 2 else 2
             print("Per " + str(dst) + " MED piu bassi su " + str(dec_matrix_ce_pe[i][j]) + " a " + str(src))
-            set_med(f"pe{3 - other_choice}", src, default_med, dst, seq)
+            set_med(f"pe{3 - other_choice}", src, default_med, dst, seq_med)
 
-            seq += 10
+            seq_med += 10
 
-            set_med(f"pe{other_choice}", src, default_med + 100, dst, seq)
+            set_med(f"pe{other_choice}", src, default_med + 100, dst, seq_med)
 
-            seq += 10
+            seq_med += 10
 
     # NUOVA STAMPA: Visualizzazione Matrice Aggregata
     header_dst = " | ".join([f"{d:>8}" for d in destinations])
@@ -144,6 +143,26 @@ def manage_pipeline():
                 gw_choice = dec_matrix_pe_gw[i][j]
                 gw_str = f"{Colors.CYAN}GW 1{Colors.ENDC}" if gw_choice == 1 else f"{Colors.GREEN}GW 2{Colors.ENDC}"
                 print(f"{pe_name:<10} -> {dst:<12} | {gw_str}")
+
+
+    default_local_pref = 100
+    seq_lp = 10
+
+    for i, pe_name in enumerate(pes):
+        for j, dst in enumerate(destinations):
+            if agg_matrix[i][j] > 0:
+                other_choice = 1 if dec_matrix_pe_gw[i][j] == 2 else 2
+                gw_choice = dec_matrix_pe_gw[i][j]
+
+                set_local_pref(pe_name, f"gw{3 - other_choice}", default_local_pref + 100, dst, seq_lp)
+
+                seq_lp += 10
+
+                set_local_pref(pe_name, f"gw{other_choice}", default_local_pref, dst, seq_lp)
+
+                seq_lp += 10
+                
+
 
     # ---------------------------------------------------------
     # 6) Esportazione JSON Finale

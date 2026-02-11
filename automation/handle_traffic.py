@@ -133,15 +133,23 @@ def update_node_med(container, local_number, remote_number, interface, med, pref
 
     print(f"[OK] {container}: neighbor {interface} → MED {med}")
 
-def update_node_local_pref(container, local_as, neighbor_ip, local_pref):
+def update_node_local_pref(container, local_as, neighbor_ip, local_pref, prefix, seq):
 
     route_map = f"LP-{neighbor_ip.replace('.', '_')}"
+    prefix_list = f"PL-{prefix.replace('.', '_').replace('/', '_')}"
 
     cmds = [
         "conf t",
-        f"route-map {route_map} permit 10",
+        f"ip prefix-list {prefix_list} seq {seq} permit {prefix}",
+
+        f"route-map {route_map} permit {seq}",
+        f"match ip address prefix-list {prefix_list}",
         f"set local-preference {local_pref}",
         "exit",
+
+        f"route-map {route_map} permit {seq + 1}",
+        "exit",
+
         f"router bgp {local_as}",
         f"neighbor {neighbor_ip} route-map {route_map} in",
         "exit",
@@ -160,7 +168,7 @@ def update_node_local_pref(container, local_as, neighbor_ip, local_pref):
         check=True
     )
 
-    print(f"[OK] {container}: neighbor {neighbor_ip} → LOCAL_PREF {local_pref}")
+    print(f"[OK] {container}: neighbor {neighbor_ip} → LOCAL_PREF {local_pref} for {prefix}")
 
 
 def get_ipv4_address(node):
@@ -181,10 +189,11 @@ def set_med(node, neighbor, med, destination, seq):
     container, local_as, remote_as, neighbor_ip = get_bgp_config(topo, node, neighbor)
     update_node_med(container, local_as, remote_as, neighbor_ip, med, prefix, seq)
 
-def set_local_pref(node, neighbor, local_pref):
+def set_local_pref(node, neighbor, local_pref, destination, seq):
     topo = load_topology()
+    prefix = get_ipv4_address(destination) + "/32"
     container, local_as, neighbor_ip = get_local_config(topo, node, neighbor)
-    update_node_local_pref(container, local_as, neighbor_ip, local_pref)
+    update_node_local_pref(container, local_as, neighbor_ip, local_pref, prefix, seq)
 
 def test_meds():
     set_med("pe1", "ce1", 100, "r1")

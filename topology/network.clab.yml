@@ -128,6 +128,7 @@ topology:
                 - ../configs/linux-host-cfg.sh:/linux-cfg.sh
                 - ../automation:/root/automation
                 - ./data.yaml:/root/topology/data.yaml
+                - /var/run/docker.sock:/var/run/docker.sock
             exec:
                 - sh /linux-cfg.sh 
                 - echo "Manager pronto con Python, Numpy e Scipy"
