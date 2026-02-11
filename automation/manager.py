@@ -5,6 +5,8 @@ import sys
 import yaml
 import numpy as np
 
+from handle_traffic import set_med
+
 # Impostiamo il path per trovare i moduli locali
 current_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(current_dir)
@@ -98,6 +100,22 @@ def manage_pipeline():
             choice = dec_matrix_ce_pe[i][j]
             if choice == 1: agg_matrix[0][j] += vol
             elif choice == 2: agg_matrix[1][j] += vol
+
+    default_med = 100
+
+    seq = 10
+
+    for i, src in enumerate(sources):
+        for j, dst in enumerate(destinations):
+            other_choice = 1 if dec_matrix_ce_pe[i][j] == 2 else 2
+            print("Per " + str(dst) + " MED piu bassi su " + str(dec_matrix_ce_pe[i][j]) + " a " + str(src))
+            set_med(f"pe{3 - other_choice}", src, default_med, dst, seq)
+
+            seq += 10
+
+            set_med(f"pe{other_choice}", src, default_med + 100, dst, seq)
+
+            seq += 10
 
     # NUOVA STAMPA: Visualizzazione Matrice Aggregata
     header_dst = " | ".join([f"{d:>8}" for d in destinations])
