@@ -107,6 +107,7 @@ nodes:
     bgp:
       asn: 65500
       router_id: 8.8.8.8
+    ipv4_address: 8.8.8.8
     interfaces:
       - { name: eth1, ipv4_address: "10.4.1.2", ipv4_mask: /30 }
       - { name: eth2, ipv4_address: "10.4.2.2", ipv4_mask: /30 }
@@ -117,6 +118,7 @@ nodes:
     bgp:
       asn: 65501
       router_id: 7.7.7.7
+    ipv4_address: 7.7.7.7
     interfaces:
       - { name: eth1, ipv4_address: "10.3.1.2", ipv4_mask: /30 }
       - { name: eth2, ipv4_address: "10.3.2.2", ipv4_mask: /30 }
@@ -127,6 +129,7 @@ nodes:
     bgp:
       asn: 65502
       router_id: 6.6.6.6
+    ipv4_address: 6.6.6.6
     interfaces:
       - { name: eth1, ipv4_address: "10.2.1.2", ipv4_mask: /30 }
       - { name: eth2, ipv4_address: "10.2.2.2", ipv4_mask: /30 }
