@@ -98,11 +98,8 @@ def verify_flows():
         
         output = traceroute(src_name, dst_ip)
 
-        print(expected_pe)
-
-        pe_found = get_remote_interface_ip("ce1", expected_pe) in output
-
-        print(expected_gw)
+        pe_found = get_remote_interface_ip(src, expected_pe) in output
+        
         gw_found = get_remote_interface_ip(expected_pe, expected_gw) in output
         
         
