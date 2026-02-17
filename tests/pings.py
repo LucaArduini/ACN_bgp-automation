@@ -60,6 +60,35 @@ def ping(node, destination):
         print("timeout")
         return False
 
+def ping_interface(node, interface, destination):
+    cmds = [
+        "ping",
+        "-I",
+        interface,
+        "-c",
+        "4",
+        destination
+    ]
+
+    full_cmd = ["docker", "exec", f"clab-project-{node}"]
+    for c in cmds:
+        full_cmd.extend([c])
+
+    p = subprocess.run(full_cmd, capture_output=True, timeout=8, text=True)
+
+    try:
+        output_stdout = str(p.stdout)
+        
+        if p.returncode == 0:
+            if "ttl" in output_stdout:
+                print(f"Node reached. Ping from {node} to {destination} works.")
+                return True
+
+
+    except subprocess.TimeoutExpired:
+        print("timeout")
+        return False
+
 nodes_from = [
     "n1",
     "n2"
@@ -75,8 +104,6 @@ for n1 in nodes_from:
     for n2 in nodes_to_check:
         ping(n1, get_ipv4_address(n2))
 
-for n1 in nodes_from:
+for n1 in nodes_to_check:
     for n2 in nodes_from:
-        if n1 != n2:
-            ping(n1, get_ipv4_address(n2))
-            ping(n2, get_ipv4_address(n1))
+        ping_interface(n1, get_ipv4_address(n1), get_ipv4_address(n2))

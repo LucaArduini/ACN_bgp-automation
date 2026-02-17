@@ -92,11 +92,14 @@ def verify_flows():
         dst_ip = get_ipv4_address(dst)
 
         print(dst_ip)
+
+        src_name = src.replace("ce", "n")
         
-        output = traceroute(src, dst_ip)
+        
+        output = traceroute(src_name, dst_ip)
 
         print(expected_pe)
-        
+
         pe_found = get_remote_interface_ip("ce1", expected_pe) in output
 
         print(expected_gw)
