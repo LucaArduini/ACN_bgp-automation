@@ -1,13 +1,13 @@
 """
-Questo script automatizza la generazione dei file di configurazione per i router FRR.
-Il processo si articola in diverse fasi:
-1. Caricamento dei dati astratti della rete dal file 'data.yaml'.
-2. Analisi delle adiacenze per identificare i vicini BGP (iBGP ed eBGP).
-3. Calcolo dei prefissi di rete da annunciare in base alle maschere di sottorete.
-4. Rendering dei template Jinja2 ('config.j2') per produrre file .conf pronti 
-   per essere caricati dai container FRR.
-Include logiche specifiche per gestire il peering BGP sia su link punto-punto 
-che attraverso segmenti LAN (bridge).
+This script automates the generation of configuration files for FRR routers.
+The process is divided into several phases:
+1. Loading abstract network data from the 'data.yaml' file.
+2. Adjacency analysis to identify BGP neighbors (iBGP and eBGP).
+3. Calculation of network prefixes to announce based on subnet masks.
+4. Rendering Jinja2 templates ('config.j2') to produce .conf files ready 
+   to be loaded by FRR containers.
+Includes specific logic to handle BGP peering both on point-to-point links 
+and across LAN segments (bridges).
 """
 
 import jinja2
@@ -16,21 +16,21 @@ import yaml
 import ipaddress
 from jinja2 import Environment, FileSystemLoader
 
-# Definizione dei percorsi per template, dati e output
+# Path definitions for templates, data, and output
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEMPLATES_DIR = os.path.join(BASE_DIR, "..", "templates")
 TOPOLOGY_DIR = os.path.join(BASE_DIR, "..", "topology")
 DATA_FILE = os.path.join(TOPOLOGY_DIR, "data.yaml")
 OUTPUT_DIR = os.path.join(BASE_DIR, "..", "configs")
 
-# Assicura l'esistenza della directory di output per le configurazioni
+# Ensures the output directory for configurations exists
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-# Inizializzazione dell'ambiente Jinja2
+# Initializing Jinja2 environment
 environment = Environment(loader=FileSystemLoader(TEMPLATES_DIR), trim_blocks=True, lstrip_blocks=True)
 template = environment.get_template("config.j2")
 
-# Caricamento della topologia dal file YAML
+# Loading topology from YAML file
 with open(DATA_FILE, "r") as f:
     data = yaml.safe_load(f)
 
@@ -39,7 +39,7 @@ links = data['links']
 nodes_map = {n['name']: n for n in nodes}
 
 def get_remote_ip(node_name, port_name):
-    """Recupera l'indirizzo IP di un'interfaccia specifica su un nodo"""
+    """Retrieves the IP address of a specific interface on a node"""
     node = nodes_map.get(node_name)
     if node and 'interfaces' in node:
         for iface in node['interfaces']:
@@ -48,17 +48,17 @@ def get_remote_ip(node_name, port_name):
     return None
 
 def get_network_address(ip, mask):
-    """Calcola l'indirizzo di rete dato IP e maschera"""
+    """Calculates the network address given IP and mask"""
     try:
         interface = ipaddress.IPv4Interface(f"{ip}{mask}")
         return str(interface.network)
     except ValueError:
         return None
 
-# Elaborazione di ogni nodo per generare la relativa configurazione
+# Processing each node to generate its configuration
 for node in nodes:
 
-    # Salta gli host e i nodi senza interfacce (es. bridge)
+    # Skip hosts and nodes without interfaces (e.g., bridges)
     if node.get('role') == 'host' or 'interfaces' not in node:
         continue
 
@@ -68,7 +68,7 @@ for node in nodes:
     
     local_asn = node['bgp']['asn'] if 'bgp' in node else None
 
-    # Identificazione delle reti da annunciare via BGP
+    # Identifying networks to announce via BGP
     if local_asn:
         for iface in node['interfaces']:
             mask = iface['ipv4_mask']
@@ -76,7 +76,7 @@ for node in nodes:
                 net = get_network_address(iface['ipv4_address'], mask)
                 if net: bgp_networks.add(net)
 
-    # Identificazione dei vicini BGP tramite l'analisi dei link
+    # Identifying BGP neighbors through link analysis
     if local_asn:
         for link in links:
             if link['a'] == hostname:
@@ -89,7 +89,7 @@ for node in nodes:
             remote_node = nodes_map.get(remote_name)
             if not remote_node: continue
 
-            # Peering su link punto-punto (Router-to-Router)
+            # Peering on point-to-point links (Router-to-Router)
             if 'bgp' in remote_node:
                 r_ip = get_remote_ip(remote_name, remote_port)
                 if r_ip:
@@ -100,7 +100,7 @@ for node in nodes:
                         "description": f"Link_to_{remote_name}"
                     }
             
-            # Peering attraverso bridge (Router-to-LAN-to-Router) per iBGP
+            # Peering through bridges (Router-to-LAN-to-Router) for iBGP
             if remote_node.get('role') == 'bridge' or remote_node.get('kind') == 'bridge':
                 for l in links:
                     p_name, p_port = ("", "")
@@ -119,7 +119,7 @@ for node in nodes:
                                     "description": f"iBGP_via_{remote_name}"
                                 }
 
-    # Rendering finale del file di configurazione
+    # Final rendering of the configuration file
     config = template.render(
         device=node,
         interfaces=node['interfaces'],
@@ -127,7 +127,7 @@ for node in nodes:
         networks=list(bgp_networks)
     )
     
-    # Scrittura del file .conf su disco
+    # Writing the .conf file to disk
     with open(os.path.join(OUTPUT_DIR, f"{hostname}.conf"), "w", newline='\n') as f:
         f.write(config)
-    print(f"Generata config per {hostname}")
+    print(f"Generated config for {hostname}")

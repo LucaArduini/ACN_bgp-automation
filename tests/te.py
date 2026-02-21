@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-Questo script valida l'efficacia delle policy di Traffic Engineering applicate dal Manager.
-Esegue dei traceroute dai nodi sorgente verso le destinazioni e confronta gli hop reali
-rilevati con il percorso atteso (PE e GW) definito nel file 'final_routing_paths.json'.
-È lo strumento principale per verificare che le modifiche BGP abbiano effettivamente 
-cambiato l'instradamento dei flussi.
+This script validates the effectiveness of the Traffic Engineering policies applied by the Manager.
+It performs traceroutes from source nodes to destinations and compares the actual hops 
+detected with the expected path (PE and GW) defined in the 'final_routing_paths.json' file.
+It is the primary tool to verify that BGP modifications have effectively 
+changed flow routing.
 """
 
 import yaml
@@ -13,7 +13,7 @@ import subprocess
 import json
 import sys
 
-# --- CONFIGURAZIONE PERCORSI ---
+# --- PATH CONFIGURATION ---
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 YAML_FILE = os.path.join(BASE_DIR, "..", "topology", "data.yaml")
 JSON_FILE = os.path.join(BASE_DIR, "..", "automation", "final_routing_paths.json")
@@ -23,42 +23,42 @@ def print_header(msg):
     print(f"\n{'='*20} {msg} {'='*20}")
 
 def load_data():
-    """Carica la topologia di rete e i flussi ottimizzati dal Manager"""
+    """Loads network topology and optimized flows from the Manager"""
     if not os.path.exists(JSON_FILE):
-        print(f"[ERR] File '{os.path.basename(JSON_FILE)}' non trovato.")
-        print(f"[TIP] Esegui prima 'manager.py' per generare i percorsi, poi riprova.")
+        print(f"[ERR] File '{os.path.basename(JSON_FILE)}' not found.")
+        print(f"[TIP] Run 'manager.py' first to generate the paths, then try again.")
         sys.exit(1)
 
     try:
         with open(YAML_FILE, 'r') as f:
-            topo = yaml.safe_load(f)
+            topology = yaml.safe_load(f)
         with open(JSON_FILE, 'r') as f:
             flows = json.load(f)
-        return topo, flows
+        return topology, flows
     except Exception as e:
-        print(f"[ERR] Errore durante il caricamento dei dati: {e}")
+        print(f"[ERR] Error while loading data: {e}")
         sys.exit(1)
 
 def get_node_ip(nodes, node_name):
-    """Restituisce l'indirizzo IP di una specifica destinazione"""
-    for n in nodes:
-        if n['name'] == node_name:
-            return str(n.get('ipv4_address', '')).split('/')[0]
+    """Returns the IP address of a specific destination"""
+    for node in nodes:
+        if node['name'] == node_name:
+            return str(node.get('ipv4_address', '')).split('/')[0]
     return None
 
-def get_link_ip(topo, node_a, node_b):
+def get_link_ip(topology, node_a, node_b):
     """
-    Trova l'IP dell'interfaccia di node_b che guarda verso node_a.
-    Questa funzione è critica poiché il traceroute mostra l'IP dell'interfaccia 
-    di ingresso del router successivo (hop).
+    Finds the IP of the interface on node_b that faces towards node_a.
+    This function is critical because traceroute shows the IP of the 
+    ingress interface of the next router (hop).
     """
-    links = topo.get('links', [])
-    nodes = topo.get('nodes', [])
+    links = topology.get('links', [])
+    nodes = topology.get('nodes', [])
     
     remote_port = None
     potential_a = [node_a, "lan"] 
 
-    # Cerca il collegamento diretto o via LAN tra i due nodi
+    # Search for direct connection or via LAN between the two nodes
     for link in links:
         if link['a'] in potential_a and link['b'] == node_b:
             remote_port = link['b_port']
@@ -68,7 +68,7 @@ def get_link_ip(topo, node_a, node_b):
             
     if not remote_port: return None
 
-    # Recupera l'IP configurato sulla porta identificata
+    # Retrieves the IP configured on the identified port
     for node in nodes:
         if node['name'] == node_b:
             for interface in node.get('interfaces', []):
@@ -77,71 +77,71 @@ def get_link_ip(topo, node_a, node_b):
     return None
 
 def run_traceroute(source_node, destination_ip):
-    """Esegue traceroute all'interno del container sorgente e cattura l'output"""
-    # Mappa il ruolo logico (ce) al container fisico (n)
+    """Executes traceroute inside the source container and captures the output"""
+    # Maps logical role (ce) to physical container (n)
     container_name = source_node.replace("ce", "n")
     full_container = f"{CLAB_PREFIX}-{container_name}"
     
-    # -n: evita risoluzione DNS (veloce), -w 1: timeout breve per test reattivi
+    # -n: avoids DNS resolution (fast), -w 1: short timeout for responsive tests
     cmd = ["docker", "exec", full_container, "traceroute", "-n", "-w", "1", "-m", "10", destination_ip]
     
     try:
-        p = subprocess.run(cmd, capture_output=True, text=True, timeout=20)
-        return p.stdout
+        process = subprocess.run(cmd, capture_output=True, text=True, timeout=20)
+        return process.stdout
     except Exception:
         return ""
 
-def verify_traffic_engineering():
-    """Confronta i percorsi reali rilevati con quelli calcolati dall'ottimizzatore"""
-    topo_data, flows = load_data()
-    nodes = topo_data.get('nodes', [])
+def validate_traffic_engineering():
+    """Compares actual detected paths with those calculated by the optimizer"""
+    topology_data, flows = load_data()
+    nodes = topology_data.get('nodes', [])
 
-    print_header("VERIFICA TRAFFIC ENGINEERING")
+    print_header("TRAFFIC ENGINEERING VERIFICATION")
     
-    header = f"{'SORGENTE':<10} | {'DEST':<10} | {'PERCORSO ATTESO':<22} | {'STATO'}"
-    print(header)
-    print("-" * len(header))
+    table_header = f"{'SOURCE':<10} | {'DEST':<10} | {'EXPECTED PATH':<22} | {'STATUS'}"
+    print(table_header)
+    print("-" * len(table_header))
 
     for flow in flows:
-        src = flow['source']
-        dst = flow['destination']
-        exp_pe = flow['path']['pe']
-        exp_gw = flow['path']['gw']
+        source = flow['source']
+        destination = flow['destination']
+        expected_pe = flow['path']['pe']
+        expected_gw = flow['path']['gw']
 
-        # 1. Recupero IP del router di destinazione finale
-        dst_ip = get_node_ip(nodes, dst)
-        if not dst_ip:
-            print(f"{src:<10} | {dst:<10} | {'IP non trovato':<22} | [SKIP]")
+        # 1. Retrieve the IP of the final destination router
+        destination_ip = get_node_ip(nodes, destination)
+        if not destination_ip:
+            print(f"{source:<10} | {destination:<10} | {'IP not found':<22} | [SKIP]")
             continue
 
-        # 2. Analisi del percorso reale tramite traceroute
-        output = run_traceroute(src, dst_ip)
+        # 2. Analyze the actual path via traceroute
+        output = run_traceroute(source, destination_ip)
 
-        # 3. Identificazione degli IP che dovrebbero apparire come hop
-        # IP del PE visto dal CE
-        pe_hop_ip = get_link_ip(topo_data, src, exp_pe)
-        # IP del GW visto dal PE
-        gw_hop_ip = get_link_ip(topo_data, exp_pe, exp_gw)
+        # 3. Identify IPs that should appear as hops
+        # PE IP as seen from the CE
+        pe_hop_ip = get_link_ip(topology_data, source, expected_pe)
+        # GW IP as seen from the PE
+        gw_hop_ip = get_link_ip(topology_data, expected_pe, expected_gw)
 
-        # Verifica se gli IP attesi sono presenti nella sequenza degli hop del traceroute
+        # Verify if expected IPs are present in the traceroute hop sequence
         pe_found = pe_hop_ip in output if pe_hop_ip else False
         gw_found = gw_hop_ip in output if gw_hop_ip else False
 
-        # 4. Determinazione del risultato del test
+        # 4. Determine test result
         if pe_found and gw_found:
             status = "[ OK ]"
         else:
             errors = []
-            if not pe_found: errors.append(f"No {exp_pe}")
-            if not gw_found: errors.append(f"No {exp_gw}")
+            if not pe_found: errors.append(f"No {expected_pe}")
+            if not gw_found: errors.append(f"No {expected_gw}")
             status = f"[FAIL: {', '.join(errors)}]"
 
-        path_str = f"{exp_pe} -> {exp_gw}"
-        print(f"{src:<10} | {dst:<10} | {path_str:<22} | {status}")
+        path_string = f"{expected_pe} -> {expected_gw}"
+        print(f"{source:<10} | {destination:<10} | {path_string:<22} | {status}")
 
-        # Messaggi di debug per investigare eventuali fallimenti (percorsi non aggiornati)
+        # Debug messages to investigate failures (non-updated paths)
         if not (pe_found and gw_found):
-            print(f"   > IP attesi: PE={pe_hop_ip}, GW={gw_hop_ip}")
+            print(f"   > Expected IPs: PE={pe_hop_ip}, GW={gw_hop_ip}")
 
 if __name__ == "__main__":
-    verify_traffic_engineering()
+    validate_traffic_engineering()

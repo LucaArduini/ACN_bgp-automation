@@ -1,19 +1,19 @@
 #######################################################################################
-# Questo Dockerfile definisce l'ambiente di runtime per il nodo "Manager".
-# A differenza dei router FRR, questo nodo richiede uno stack software completo per:
-# 1. Eseguire script Python di automazione.
-# 2. Risolvere problemi di ottimizzazione lineare (tramite Numpy/Scipy).
-# 3. Interagire con gli altri container tramite comandi Docker (docker-cli).
+# This Dockerfile defines the runtime environment for the "Manager" node.
+# Unlike FRR routers, this node requires a complete software stack to:
+# 1. Execute Python automation scripts.
+# 2. Solve linear optimization problems (using Numpy/Scipy).
+# 3. Interact with other containers using Docker commands (docker-cli).
 #######################################################################################
 
-# Usa Alpine Linux come base per garantire leggerezza e sicurezza.
+# Use Alpine Linux as a base to ensure lightness and security.
 FROM alpine:latest
 
-# Installazione dei pacchetti necessari:
-# - python3 e pip: per il core dell'automazione
-# - py3-numpy/scipy: per il calcolo delle matrici di traffico e ottimizzazione MILP
-# - bash/iproute2: per utilities di rete e shell
-# - docker-cli: permette al Manager di eseguire comandi vtysh nei router FRR
+# Installation of required packages:
+# - python3 and pip: for the automation core
+# - py3-numpy/scipy: for traffic matrix calculation and MILP optimization
+# - bash/iproute2: for network utilities and shell
+# - docker-cli: allows the Manager to execute vtysh commands in FRR routers
 RUN apk add --no-cache \
     python3 \
     py3-pip \
@@ -24,5 +24,5 @@ RUN apk add --no-cache \
     iproute2 \
     docker-cli
 
-# Definizione della directory di lavoro all'interno del container
+# Definition of the working directory inside the container
 WORKDIR /root

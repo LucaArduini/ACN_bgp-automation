@@ -1,11 +1,11 @@
 """
-Questo script funge da coordinatore principale per il deployment del progetto.
-L'orchestrator automatizza l'intero workflow iniziale:
-1. Esegue localmente gli script di generazione per la topologia e le configurazioni dei router.
-2. Stabilisce una connessione SSH con il server remoto specificato nel file .env.
-3. Sincronizza i file necessari tramite SCP, gestendo la pulizia del workspace remoto
-   e la normalizzazione dei percorsi tra sistemi operativi diversi.
-4. Imposta i permessi corretti sul server remoto per consentire l'esecuzione degli script di bootstrap.
+This script acts as the main coordinator for the project deployment.
+The orchestrator automates the entire initial workflow:
+1. Runs generation scripts locally for the topology and router configurations.
+2. Establishes an SSH connection with the remote server specified in the .env file.
+3. Synchronizes the necessary files via SCP, managing remote workspace cleanup 
+   and path normalization between different operating systems.
+4. Sets the correct permissions on the remote server to allow the execution of bootstrap scripts.
 """
 
 import os
@@ -15,26 +15,26 @@ from paramiko import SSHClient, AutoAddPolicy, RSAKey
 from scp import SCPClient
 from dotenv import load_dotenv
 
-# Caricamento delle variabili d'ambiente per l'accesso remoto
+# Loading environment variables for remote access
 load_dotenv()
 
 REMOTE_HOST = os.getenv('REMOTE_HOST')
 REMOTE_USER = os.getenv('REMOTE_USER')
 REMOTE_PASS = os.getenv('REMOTE_PASS')
 
-# Validazione delle credenziali necessarie al deployment
+# Validation of credentials needed for deployment
 if not REMOTE_HOST:
-    print("[-] Errore: La variabile REMOTE_HOST non è definita nel file .env")
+    print("[-] Error: The REMOTE_HOST variable is not defined in the .env file")
     sys.exit(1)
     
 if not REMOTE_USER:
-    print("[-] Errore: La variabile REMOTE_USER non è definita nel file .env")
+    print("[-] Error: The REMOTE_USER variable is not defined in the .env file")
     sys.exit(1)
 
-# Definizione della root del progetto sul server di destinazione
+# Definition of the project root on the target server
 REMOTE_PROJECT_ROOT = f'/home/{REMOTE_USER}/ACN_bgp-automation' 
 
-# Elenco dei file e delle directory essenziali da trasferire al server
+# List of essential files and directories to transfer to the server
 FILES_TO_TRANSFER = [
     "topology",
     "configs",
@@ -49,112 +49,112 @@ FILES_TO_TRANSFER = [
     os.path.join("automation", "handle_traffic.py")
 ]
 
-def run_script(script_path):
-    """Esegue uno script python locale per la generazione degli artefatti"""
-    print(f"[*] Esecuzione locale di {script_path}...")
+def run_local_script(script_path):
+    """Executes a local python script for artifact generation"""
+    print(f"[*] Local execution of {script_path}...")
     try:
         if not os.path.exists(script_path):
-            print(f"[-] Errore: Il file {script_path} non esiste.")
+            print(f"[-] Error: The file {script_path} does not exist.")
             sys.exit(1)
             
         subprocess.run(
             [sys.executable, script_path], 
             check=True
         )
-        print(f"[+] {script_path} completato.\n")
+        print(f"[+] {script_path} completed.\n")
     except subprocess.CalledProcessError:
-        print(f"[-] Errore durante l'esecuzione di {script_path}.")
+        print(f"[-] Error during execution of {script_path}.")
         sys.exit(1)
 
 def upload_selected_files():
-    """Gestisce la sessione SSH e il trasferimento dei file tramite SCP"""
-    print(f"[*] Connessione a {REMOTE_USER}@{REMOTE_HOST}...")
+    """Manages the SSH session and file transfer via SCP"""
+    print(f"[*] Connecting to {REMOTE_USER}@{REMOTE_HOST}...")
     
-    ssh = SSHClient()
-    ssh.set_missing_host_key_policy(AutoAddPolicy())
+    ssh_client = SSHClient()
+    ssh_client.set_missing_host_key_policy(AutoAddPolicy())
     
     try:
-        ssh.connect(REMOTE_HOST, username=REMOTE_USER, password=REMOTE_PASS)
+        ssh_client.connect(REMOTE_HOST, username=REMOTE_USER, password=REMOTE_PASS)
         
-        # Pulizia della directory remota per garantire un deploy pulito
-        print(f"[*] Cancellazione totale di {REMOTE_PROJECT_ROOT} (richiede sudo)...")
-        # Usiamo 'sudo -S' per leggere la password da 'echo' ed eseguire il comando come root
-        cmd_rm = f"echo '{REMOTE_PASS}' | sudo -S rm -rf {REMOTE_PROJECT_ROOT}"
-        stdin, stdout, stderr = ssh.exec_command(cmd_rm)
+        # Cleaning the remote directory to ensure a clean deployment
+        print(f"[*] Total deletion of {REMOTE_PROJECT_ROOT} (requires sudo)...")
+        # We use 'sudo -S' to read the password from 'echo' and execute the command as root
+        delete_command = f"echo '{REMOTE_PASS}' | sudo -S rm -rf {REMOTE_PROJECT_ROOT}"
+        stdin, stdout, stderr = ssh_client.exec_command(delete_command)
         exit_status = stdout.channel.recv_exit_status()
         
         if exit_status != 0:
-            print(f"[-] Errore durante la cancellazione: {stderr.read().decode()}")
+            print(f"[-] Error during deletion: {stderr.read().decode()}")
         
-        print(f"[*] Ricreazione cartella root {REMOTE_PROJECT_ROOT}...")
-        ssh.exec_command(f"mkdir -p {REMOTE_PROJECT_ROOT}")
+        print(f"[*] Recreating root folder {REMOTE_PROJECT_ROOT}...")
+        ssh_client.exec_command(f"mkdir -p {REMOTE_PROJECT_ROOT}")
 
-        # Trasferimento dei file tramite SCPClient
-        with SCPClient(ssh.get_transport()) as scp:
+        # Transferring files via SCPClient
+        with SCPClient(ssh_client.get_transport()) as scp:
             for item in FILES_TO_TRANSFER:
                 if not os.path.exists(item):
-                    print(f"[!] Attenzione: Il file/cartella locale '{item}' non esiste. Salto.")
+                    print(f"[!] Warning: Local file/folder '{item}' does not exist. Skipping.")
                     continue
 
-                # Normalizzazione dei separatori di percorso per ambiente Linux
-                item_linux = item.replace("\\", "/")
+                # Normalizing path separators for Linux environment
+                linux_item = item.replace("\\", "/")
                 
-                # Calcolo della destinazione remota mantenendo la struttura delle cartelle
+                # Calculating remote destination while maintaining folder structure
                 if os.path.isdir(item):
-                    parent_dir = os.path.dirname(item_linux) 
-                    remote_dest_path = os.path.join(REMOTE_PROJECT_ROOT, parent_dir).replace("\\", "/")
+                    parent_directory = os.path.dirname(linux_item) 
+                    remote_destination_path = os.path.join(REMOTE_PROJECT_ROOT, parent_directory).replace("\\", "/")
                 else:
-                    remote_dest_path = os.path.join(REMOTE_PROJECT_ROOT, item_linux).replace("\\", "/")
+                    remote_destination_path = os.path.join(REMOTE_PROJECT_ROOT, linux_item).replace("\\", "/")
                 
-                # Creazione ricorsiva delle directory genitrici sul server remoto
+                # Recursive creation of parent directories on the remote server
                 if os.path.isdir(item):
-                    remote_parent_mkdir = remote_dest_path
+                    remote_mkdir_path = remote_destination_path
                 else:
-                    remote_parent_mkdir = os.path.dirname(remote_dest_path)
+                    remote_mkdir_path = os.path.dirname(remote_destination_path)
                 
-                print(f"[*] Copia di '{item}' -> '{remote_dest_path}'")
+                print(f"[*] Copying '{item}' -> '{remote_destination_path}'")
                 
-                ssh.exec_command(f"mkdir -p {remote_parent_mkdir}")
-                scp.put(item, remote_path=remote_dest_path, recursive=True, preserve_times=True)
+                ssh_client.exec_command(f"mkdir -p {remote_mkdir_path}")
+                scp.put(item, remote_path=remote_destination_path, recursive=True, preserve_times=True)
         
-        # Impostazione dei permessi di esecuzione per gli script shell trasferiti
-        print(f"[*] Imposto i permessi (755) su {REMOTE_PROJECT_ROOT}...")
-        cmd_chmod = f"echo '{REMOTE_PASS}' | sudo -S chmod -R 755 {REMOTE_PROJECT_ROOT}"
-        stdin, stdout, stderr = ssh.exec_command(cmd_chmod)
+        # Setting execution permissions for the transferred shell scripts
+        print(f"[*] Setting permissions (755) on {REMOTE_PROJECT_ROOT}...")
+        chmod_command = f"echo '{REMOTE_PASS}' | sudo -S chmod -R 755 {REMOTE_PROJECT_ROOT}"
+        stdin, stdout, stderr = ssh_client.exec_command(chmod_command)
         
         if stdout.channel.recv_exit_status() == 0:
-            print(f"[+] Permessi aggiornati con successo.")
+            print(f"[+] Permissions updated successfully.")
         else:
-            print(f"[-] Errore permessi: {stderr.read().decode()}")
+            print(f"[-] Permissions error: {stderr.read().decode()}")
             
-        # Per sicurezza, ci assicuriamo che l'utente 'student' sia il proprietario di tutto
-        print(f"[*] Reimposto la proprietà dei file all'utente {REMOTE_USER}...")
-        cmd_chown = f"echo '{REMOTE_PASS}' | sudo -S chown -R {REMOTE_USER}:{REMOTE_USER} {REMOTE_PROJECT_ROOT}"
-        ssh.exec_command(cmd_chown)
+        # For security, we ensure the 'student' user is the owner of everything
+        print(f"[*] Resetting file ownership to user {REMOTE_USER}...")
+        chown_command = f"echo '{REMOTE_PASS}' | sudo -S chown -R {REMOTE_USER}:{REMOTE_USER} {REMOTE_PROJECT_ROOT}"
+        ssh_client.exec_command(chown_command)
 
-        print(f"\n[+] Deploy completato con successo in {REMOTE_PROJECT_ROOT}")
+        print(f"\n[+] Deployment successfully completed in {REMOTE_PROJECT_ROOT}")
         
     except Exception as e:
-        print(f"[-] Errore durante il trasferimento SSH/SCP: {e}")
+        print(f"[-] Error during SSH/SCP transfer: {e}")
         sys.exit(1)
     finally:
-        ssh.close()
+        ssh_client.close()
 
 def main():
-    """Workflow principale: generazione locale -> deploy remoto"""
+    """Main workflow: local generation -> remote deployment"""
     
-    # 1. Generazione file YAML di Containerlab a partire dai dati
-    topo_script = os.path.join("automation", "build_topology.py")
-    run_script(topo_script)
+    # 1. Generating Containerlab YAML file from data
+    topology_script = os.path.join("automation", "build_topology.py")
+    run_local_script(topology_script)
 
-    # 2. Generazione delle configurazioni FRR tramite template Jinja2
-    config_script = os.path.join("automation", "build_configs.py")
-    run_script(config_script)
+    # 2. Generating FRR configurations via Jinja2 templates
+    config_generation_script = os.path.join("automation", "build_configs.py")
+    run_local_script(config_generation_script)
 
-    # 3. Trasferimento degli artefatti sul server remoto
+    # 3. Transferring artifacts to the remote server
     upload_selected_files()
 
-    print("\n[ok] Script terminato.")
+    print("\n[ok] Script terminated.")
 
 if __name__ == "__main__":
     main()

@@ -1,13 +1,13 @@
 """
-Questo script simula il sistema di monitoraggio e predizione del traffico per l'AS65020.
-Il suo compito è generare periodicamente la "Traffic Prediction Matrix" richiesta 
-dal Task 3 del progetto. Lo script:
-1. Analizza la topologia (data.yaml) per identificare i nodi sorgente (CE) e destinazione (Router).
-2. Genera una matrice di traffico casuale (in Mbps) applicando una politica di carico 
-   sbilanciato (un valore zero per riga) per testare l'efficacia dell'ottimizzatore.
-3. Produce un report testuale a console per debug.
-4. Salva i dati in un file JSON (traffic_matrix.json) che verrà consumato dal Manager
-   per le decisioni di Traffic Engineering.
+This script simulates the traffic monitoring and prediction system for AS65020.
+Its task is to periodically generate the "Traffic Prediction Matrix" required 
+by Task 3 of the project. The script:
+1. Analyzes the topology (data.yaml) to identify source nodes (CE) and destination nodes (Router).
+2. Generates a random traffic matrix (in Mbps) applying an unbalanced load policy 
+   (one zero value per row) to test the optimizer's effectiveness.
+3. Produces a text report on the console for debugging.
+4. Saves the data to a JSON file (traffic_matrix.json) that will be consumed by the Manager
+   for Traffic Engineering decisions.
 """
 
 import yaml
@@ -17,14 +17,14 @@ import os
 import sys
 from datetime import datetime
 
-# Definizione dei percorsi per i dati di input/output
+# Path definition for input/output data
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 YAML_FILE = os.path.join(BASE_DIR, "..", "topology", "data.yaml")
 JSON_FILE = os.path.join(BASE_DIR, "traffic_matrix.json")
 
 
 def load_topology_data():
-    """Analizza data.yaml per mappare i ruoli dei router nella rete"""
+    """Analyzes data.yaml to map router roles in the network"""
     if not os.path.exists(YAML_FILE):
         print(f"[ERR] File not found: {YAML_FILE}")
         sys.exit(1)
@@ -40,7 +40,7 @@ def load_topology_data():
     pe_routers = []
     destinations_routers = []
     
-    # Classificazione dei nodi in base al ruolo definito nella topologia
+    # Classify nodes based on the role defined in the topology
     if 'nodes' in data:
         for n in data['nodes']:
             role = n.get('role')
@@ -53,7 +53,7 @@ def load_topology_data():
             elif role == 'router':
                 destinations_routers.append(name)
     
-    # Ordinamento per garantire una struttura della matrice consistente
+    # Sorting to ensure consistent matrix structure
     source_routers.sort()
     pe_routers.sort()
     destinations_routers.sort()
@@ -67,14 +67,14 @@ def load_topology_data():
 
 
 def generate_traffic_matrix(source_routers, destinations_routers):
-    """Genera una domanda di traffico casuale con pattern di sbilanciamento"""
+    """Generates a random traffic demand with unbalancing patterns"""
     matrix = []
 
     print(f"\n--- Generating Traffic Matrix (Source -> Destination) ---")
     
     for src in source_routers:
         row = []
-        # Forza un link a zero traffico per simulare flussi non uniformi
+        # Force one link to zero traffic to simulate non-uniform flows
         zero_index = random.randint(0, len(destinations_routers) - 1)
         
         for i in range(len(destinations_routers)):
@@ -90,7 +90,7 @@ def generate_traffic_matrix(source_routers, destinations_routers):
 
 
 def print_matrix(source_routers, destinations_routers, matrix):
-    """Visualizza la matrice generata in un formato tabellare leggibile"""
+    """Displays the generated matrix in a readable tabular format"""
     
     header = f"{'Source / Destination':<20} | " + " | ".join([f"{d:>8}" for d in destinations_routers])
     separator = "-" * len(header)
@@ -110,7 +110,7 @@ def print_matrix(source_routers, destinations_routers, matrix):
 
 
 def save_to_json(source_routers, pe_routers, destinations_routers, matrix):
-    """Serializza la matrice e i metadati in JSON per il sistema di automazione"""
+    """Serializes the matrix and metadata into JSON for the automation system"""
     
     flows = []
     for i, src in enumerate(source_routers):
@@ -145,21 +145,21 @@ def save_to_json(source_routers, pe_routers, destinations_routers, matrix):
 
 
 def generate_and_save_traffic_matrix():
-    """Funzione principale per il ciclo di monitoraggio traffico"""
-    # 1. Recupero elenchi dei nodi
+    """Main function for the traffic monitoring cycle"""
+    # 1. Retrieve node lists
     source_routers, pe_routers, destinations_routers = load_topology_data()
     
     if not source_routers or not destinations_routers:
         print("[ERR] Missing Source or Destination nodes in topology.")
         return
 
-    # 2. Creazione della matrice di carico
+    # 2. Create the load matrix
     matrix = generate_traffic_matrix(source_routers, destinations_routers)
     
-    # 3. Logging a console
+    # 3. Console logging
     print_matrix(source_routers, destinations_routers, matrix)
     
-    # 4. Esportazione per il Manager
+    # 4. Export for the Manager
     save_to_json(source_routers, pe_routers, destinations_routers, matrix)
 
 if __name__ == "__main__":

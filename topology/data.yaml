@@ -1,6 +1,6 @@
-# Definizione centralizzata della topologia di rete.
-# Contiene le specifiche di nodi (ruoli, ASN, IP), collegamenti e capacità dei link.
-# Viene utilizzato per generare configurazioni, topologia Containerlab e matrici di traffico.
+# Centralized network topology definition.
+# Contains specifications for nodes (roles, ASN, IP), connections, and link capacities.
+# Used to generate configurations, Containerlab topology, and traffic matrices.
 
 nodes:
   - name: n1
