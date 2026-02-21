@@ -1,3 +1,13 @@
+"""
+Questo script genera il file di orchestrazione 'network.clab.yml' per Containerlab.
+Oltre alla generazione del file tramite Jinja2, lo script include un motore di 
+validazione dei dati che previene errori comuni di configurazione di rete:
+1. Rileva collisioni di indirizzi IP (IP duplicati).
+2. Verifica la coerenza delle sottoreti sui link (entrambi gli endpoint sulla stessa rete).
+3. Controlla che le maschere di sottorete siano sufficientemente ampie per ospitare i nodi.
+Se la validazione fallisce, la generazione viene interrotta per evitare deploy errati.
+"""
+
 import jinja2
 import os
 import yaml
@@ -5,8 +15,6 @@ import sys
 import ipaddress
 from jinja2 import Environment, FileSystemLoader
 
-
-# --- FUNZIONE DI VALIDAZIONE ---
 def validate_data(data):
     """
     Esegue controlli di integrità sui dati della topologia:
@@ -16,21 +24,16 @@ def validate_data(data):
     print("--- Avvio Validazione Dati ---")
     errors = []
     
-    # Mappa per tracciare IP -> (Nodo, Interfaccia)
     seen_ips = {}
-    # Mappa per facilitare il controllo dei link: "nodo:interfaccia" -> Oggetto IPv4Interface
     interface_map = {}
 
     # 1. CONTROLLO DUPLICATI E POPOLAZIONE MAPPE
     for node in data['nodes']:
-        # Controlla IP di gestione (se presente a livello root del nodo)
         if 'ipv4_address' in node and node.get('role') != 'host': 
-            # Nota: saltiamo gli host che potrebbero non avere maschera definita qui
             pass 
 
         if 'interfaces' in node:
             for iface in node['interfaces']:
-                # Saltiamo interfacce senza IP (es. L2 puri)
                 if 'ipv4_address' not in iface or 'ipv4_mask' not in iface:
                     continue
                 
@@ -38,58 +41,51 @@ def validate_data(data):
                 mask_str = iface['ipv4_mask']
                 full_addr = f"{ip_str}{mask_str}"
 
-                # Check Duplicati
+                # Rilevamento di indirizzi IP assegnati a più interfacce
                 if ip_str in seen_ips:
                     prev_node, prev_iface = seen_ips[ip_str]
                     errors.append(f"[DUPLICATE IP] L'indirizzo {ip_str} è usato sia su {prev_node}:{prev_iface} che su {node['name']}:{iface['name']}")
                 else:
                     seen_ips[ip_str] = (node['name'], iface['name'])
 
-                # Salviamo l'oggetto interfaccia per i controlli successivi sui link
+                # Validazione formale dell'indirizzo IPv4
                 try:
-                    # ip_interface gestisce automaticamente calcoli di rete (es. 192.168.1.1/24)
                     if_obj = ipaddress.ip_interface(full_addr)
                     key = f"{node['name']}:{iface['name']}"
                     interface_map[key] = if_obj
                 except ValueError as e:
                     errors.append(f"[INVALID IP] {node['name']}:{iface['name']} ha un IP non valido: {full_addr}. Errore: {e}")
 
-    # 2. CONTROLLO LINK E DIMENSIONE SUBNET
+    # 2. CONTROLLO COERENZA DEI LINK
     for link in data['links']:
-        # Costruiamo le chiavi per cercare nella mappa (es. "pe1:eth1")
         endpoint_a = f"{link['a']}:{link['a_port']}"
         endpoint_b = f"{link['b']}:{link['b_port']}"
 
-        # Se entrambe le estremità hanno un IP configurato, controlliamo la coerenza
         if endpoint_a in interface_map and endpoint_b in interface_map:
             ip_a = interface_map[endpoint_a]
             ip_b = interface_map[endpoint_b]
 
-            # A. Controllo Corrispondenza Network
-            # Se uno è 10.0.1.1/24 e l'altro 10.0.2.1/24 -> ERRORE
+            # Verifica che entrambi i lati del link appartengano alla stessa sottorete
             if ip_a.network != ip_b.network:
                 errors.append(f"[SUBNET MISMATCH] Link tra {endpoint_a} e {endpoint_b}: Le subnet non coincidono ({ip_a.network} vs {ip_b.network})")
 
-            # B. Controllo Dimensione Maschera (Mask Size)
-            # Per un link punto-punto servono almeno 2 IP disponibili.
-            # Una /32 ha 1 solo IP -> Errore. Una /31 (2 IP) o /30 (4 IP) vanno bene.
+            # Verifica che la maschera permetta almeno 2 host (punto-punto)
             if ip_a.network.num_addresses < 2:
-                 errors.append(f"[MASK TOO SMALL] Link tra {endpoint_a} e {endpoint_b}: La maschera {ip_a.with_netmask} è troppo piccola per un link (supporta solo {ip_a.network.num_addresses} IP)")
+                 errors.append(f"[MASK TOO SMALL] Link tra {endpoint_a} e {endpoint_b}: La maschera {ip_a.with_netmask} è troppo piccola")
 
-    # 3. ESITO
+    # Gestione esito validazione
     if errors:
         print("!!! TROVATI ERRORI CRITICI NEI DATI !!!")
         for e in errors:
             print(f" - {e}")
         print("Generazione interrotta.")
-        sys.exit(1) # Esce con codice di errore
+        sys.exit(1)
     else:
         print("Validazione superata: Nessun duplicato e subnet coerenti.")
 
+# --- MAIN SCRIPT ---
 
-# -------------------- MAIN SCRIPT --------------------
-
-# --- GESTIONE PERCORSI ---
+# Configurazione percorsi e setup ambiente Jinja2
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TEMPLATES_DIR = os.path.join(BASE_DIR, "..", "templates")
 TOPOLOGY_DIR = os.path.join(BASE_DIR, "..", "topology")
@@ -97,22 +93,22 @@ TOPOLOGY_DIR = os.path.join(BASE_DIR, "..", "topology")
 data_path = os.path.join(TOPOLOGY_DIR, "data.yaml")
 output_path = os.path.join(TOPOLOGY_DIR, "network.clab.yml")
 
-# --- SETUP JINJA2 ---
+# Setup del motore Jinja2
 environment = Environment(
     loader=FileSystemLoader(TEMPLATES_DIR),
-    trim_blocks=True,      # Rimuove il primo newline dopo un blocco {% %}
-    lstrip_blocks=True     # Rimuove tab/spazi prima di un blocco {% %}
+    trim_blocks=True,
+    lstrip_blocks=True
 )
 template = environment.get_template("topology.j2")
 
-# --- LETTURA DATI ---
+# Lettura del file dei dati sorgente
 with open(data_path, 'r') as f:
     data = yaml.safe_load(f)
 
-# --- VALIDAZIONE DATI ---
+# Validazione dei dati prima della generazione della topologia
 validate_data(data)
 
-# --- GENERAZIONE FILE ---
+# Rendering del file YAML per Containerlab
 content = template.render(nodes=data['nodes'], links=data['links'])
 with open(output_path, 'w', newline='\n') as f:
     f.write(content)

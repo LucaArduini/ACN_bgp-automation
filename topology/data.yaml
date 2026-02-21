@@ -1,3 +1,7 @@
+# Definizione centralizzata della topologia di rete.
+# Contiene le specifiche di nodi (ruoli, ASN, IP), collegamenti e capacità dei link.
+# Viene utilizzato per generare configurazioni, topologia Containerlab e matrici di traffico.
+
 nodes:
   - name: n1
     role: host

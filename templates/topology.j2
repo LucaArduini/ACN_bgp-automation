@@ -20,6 +20,7 @@ topology:
             binds:  
                 - ../configs/linux-host-cfg.sh:/linux-cfg.sh
                 - ../automation:/root/automation
+                - ../tests:/root/tests
                 - ./data.yaml:/root/topology/data.yaml
                 - /var/run/docker.sock:/var/run/docker.sock
             exec:

@@ -50,6 +50,7 @@ venv/
 # SCRIPT LOCALI / UTILITY
 # ==============================
 normalize_lf.py
+/automation/optimizer.m
 
 # ==============================
 # FILE DI OUTPUT LOCALI

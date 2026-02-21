@@ -1,3 +1,9 @@
+"""
+Questo modulo gestisce l'Ingress Traffic Engineering dell'AS65020.
+Utilizza un modello MILP per ripartire equamente i flussi provenienti dai CE tra i due PE disponibili,
+minimizzando lo sbilanciamento del carico in ingresso.
+"""
+
 import json
 import numpy as np
 from pathlib import Path
@@ -7,13 +13,10 @@ BASE_DIR = Path(__file__).resolve().parent
 JSON_PATH = BASE_DIR / "traffic_matrix.json"
 
 def load_traffic_matrix():
-    """
-    Legge traffic_matrix.json dal percorso default e restituisce la matrice.
-    """
+    """Carica la matrice dei flussi dal file JSON"""
     with open(JSON_PATH, "r", encoding="utf-8") as f:
         data = json.load(f)
 
-    # Correzione chiave: nel tuo generatore la chiave è "traffic_matrix_raw"
     if "traffic_matrix_raw" not in data:
         raise KeyError("Nel JSON manca la chiave 'traffic_matrix_raw'.")
 
@@ -21,6 +24,7 @@ def load_traffic_matrix():
 
 def _solve_partitioning_milp(c):
     """
+    Risolve il problema del partizionamento dei flussi tra PE1 e PE2
     Restituisce il vettore binario x (0 o 1) che minimizza lo sbilanciamento.
     """
     c = np.asarray(c, dtype=float).ravel()
@@ -50,6 +54,7 @@ def _solve_partitioning_milp(c):
         ub=np.r_[np.ones(n),  np.inf]
     )
 
+    # Variabili binarie per la scelta del PE e continua per t
     integrality = np.r_[np.ones(n, dtype=int), 0]
 
     res = milp(c=obj, integrality=integrality, bounds=bounds, constraints=constraints)
@@ -77,9 +82,13 @@ def ottimizzazione_scelta_PE(matrice_input=None):
     c = matrice.reshape(-1, order="C")
     
     # 3. Solver
+    # x=0 -> PE1, x=1 -> PE2
     x = _solve_partitioning_milp(c)
     
     # 4. Trasformazione output
+    # Mappatura:
+    # Se x[i] = 0 -> 1 (PE1), se x[i] = 1 -> 2 (PE2)
+    # Se invece c[i] = 0 (flusso nullo), assegniamo 0 (nessun PE)
     scelta_pe_ottima = np.where(c != 0, x + 1, 0)
     
     return scelta_pe_ottima

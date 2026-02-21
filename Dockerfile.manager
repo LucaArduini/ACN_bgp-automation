@@ -1,7 +1,19 @@
-# Usa Alpine come base
+#######################################################################################
+# Questo Dockerfile definisce l'ambiente di runtime per il nodo "Manager".
+# A differenza dei router FRR, questo nodo richiede uno stack software completo per:
+# 1. Eseguire script Python di automazione.
+# 2. Risolvere problemi di ottimizzazione lineare (tramite Numpy/Scipy).
+# 3. Interagire con gli altri container tramite comandi Docker (docker-cli).
+#######################################################################################
+
+# Usa Alpine Linux come base per garantire leggerezza e sicurezza.
 FROM alpine:latest
 
-# Installa Python e le librerie necessarie (l'installazione avviene ora sul tuo PC)
+# Installazione dei pacchetti necessari:
+# - python3 e pip: per il core dell'automazione
+# - py3-numpy/scipy: per il calcolo delle matrici di traffico e ottimizzazione MILP
+# - bash/iproute2: per utilities di rete e shell
+# - docker-cli: permette al Manager di eseguire comandi vtysh nei router FRR
 RUN apk add --no-cache \
     python3 \
     py3-pip \
@@ -12,5 +24,5 @@ RUN apk add --no-cache \
     iproute2 \
     docker-cli
 
-# Imposta la directory di lavoro
+# Definizione della directory di lavoro all'interno del container
 WORKDIR /root
