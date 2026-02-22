@@ -36,8 +36,8 @@ The emulated network represents **AS65020**, a transit provider connecting Custo
     *   **2 Provider Edges (PE1, PE2):** Entry points for customer traffic.
     *   **2 Gateways (GW1, GW2):** Exit points towards Upstream providers.
     *   **Manager Node:** A specialized Alpine container running the Python optimization logic.
-*   **Customers:** 2 Customer ASes (CE1, CE2) providing redundancy.
-*   **Upstreams:** 2 Upstream Providers connecting to the Internet (simulated by Google/Cloudflare destinations).
+*   **Customers:** 2 Customer ASes (CE1, CE2).
+*   **Upstreams:** 2 Upstream Providers connecting to the Internet.
 
 ---
 
@@ -73,6 +73,7 @@ The core of this project is the `manager.py` script, which performs two sequenti
 ├── templates/             # Jinja2 templates (frr.conf, topology)
 ├── tests/                 # Validation scripts (pings, traceroute, te)
 ├── bootstrap.sh           # VM setup script
+├── teardown.sh            # VM cleanup script
 ├── orchestrator.py        # Deployment pipeline (Local -> VM)
 ├── install.py             # Dependency installer
 └── data.yaml              # Topology Source of Truth
@@ -82,51 +83,82 @@ The core of this project is the `manager.py` script, which performs two sequenti
 
 ## 🛠️ Installation & Usage
 
-The workflow is designed to run via an orchestration script that deploys the lab onto a target machine (e.g., a VM or a local Linux host).
+This project is executed through a set of automated **pipelines**, split between:
+
+- **Host machine (your laptop/PC)**: generates artifacts and deploys them to the VM.
+- **Target machine (Linux VM)**: runs Docker + Containerlab and hosts the emulated network.
 
 ### 1. Prerequisites
 
+**Host machine**
 - **Python** 3.x
+
+**Target VM**
 - **Docker**
-- **Containerlab** (installed on the target machine)
+- **Containerlab**
 
-### 2. Setup (Host Machine)
+### 2. Host Machine Setup (Dependencies)
 
-Install local Python dependencies:
+Install local Python dependencies required by the orchestration scripts:
 
 ```bash
 python3 install.py
 ```
 
-### 3. Deploy and Run
+### 3. Deploy to the VM (Orchestration Pipeline)
 
-The `orchestrator.py` script handles artifact generation, file synchronization, and startup.
+From the **host machine**, run:
 
 ```bash
-# Run the orchestration pipeline
 python3 orchestrator.py
 ```
 
-This script will generate configurations, copy files to the target environment, build the custom Manager container, and start the topology.
+This pipeline performs:
 
-### 4. Execute Traffic Engineering
+1. **Artifact generation**
+   - Generates the Containerlab topology file (e.g., `topology/network.clab.yml`)
+   - Generates router configurations under `configs/`
 
-Once the lab is running, execute the optimization loop inside the Manager container:
+2. **Synchronization to the VM**
+   - Connects via SSH/SCP using credentials from `.env`
+   - Uploads the necessary folders and scripts (`configs/`, `automation/`, `tests/`, `bootstrap.sh`, `teardown.sh`, and the Manager build files)
+
+### 4. Bootstrap the Lab on the VM
+
+SSH into the **target VM**, move into the project directory, then start the bootstrap pipeline:
+
+```bash
+# On the VM
+./bootstrap.sh
+```
+
+`bootstrap.sh` will:
+- verify prerequisites and connectivity,
+- build the custom **Manager** image,
+- deploy the lab with **Containerlab** using the generated topology.
+
+### 5. Run Traffic Engineering (inside the Manager container)
+
+
+Once the topology is up, open a shell in the Manager container:
 
 ```bash
 docker exec -it clab-project-manager sh
-
-# Inside the container:
-python3 manager.py
 ```
 
-This will generate traffic, compute optimal paths, and apply Route Maps to the routers.
+Then start the control loop:
+
+```bash
+python3 automation/manager.py
+```
+
+The manager generates/loads a traffic matrix, solves the MILP optimizations, and applies BGP policies (**MED** and **Local Preference**) on the running routers.
 
 ---
 
 ## 🧪 Testing & Validation
 
-The `tests/` directory contains scripts to verify the network state.
+Run tests from the **VM** (or any machine that can access the same Docker daemon used by Containerlab).
 
 ### Connectivity Check
 
@@ -138,7 +170,7 @@ python3 tests/pings.py
 
 ### TE Validation
 
-Performs traceroute analysis to confirm that packets follow the mathematically optimized paths (verifying MED and LocalPref effects):
+Performs traceroute analysis to confirm that packets follow the optimized paths:
 
 ```bash
 python3 tests/te.py
@@ -148,9 +180,9 @@ python3 tests/te.py
 
 ## 🧹 Cleanup
 
-To stop the emulation and clean up all containers and network bridges:
+To stop the emulation and restore a clean VM state, run:
 
 ```bash
-# On the remote server
-sudo containerlab destroy -t topology/network.clab.yml --cleanup-all
+# On the VM
+./teardown.sh
 ```
