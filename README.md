@@ -28,6 +28,15 @@ The goal is to automate the operations of a simplified Service Provider network.
 
 ---
 
+## 📖 Documentation & Presentation
+
+Detailed information about the project's design, mathematical models, and implementation results can be found here:
+
+*   **[Technical Report (PDF)](doc/documentation.pdf)**: A comprehensive document covering the network design, MILP formulations, and test results.
+*   **[Presentation Slides (PDF)](doc/slides.pdf)**: The slide deck used for the final project presentation.
+
+---
+
 ## 🏗️ Network Architecture
 
 The emulated network represents **AS65020**, a transit provider connecting Customers to the Internet.
