@@ -4,7 +4,7 @@ Group work carried out by the students: [Luca Arduini](https://github.com/LucaAr
 # 📡 BGP Network Automation & Traffic Engineering
 
 <p align="center">
-  <img src="topology/topology.png" alt="Network Topology Diagram" width="800" />
+  <img src="topology/detailed_topology.png" alt="Network Topology Diagram" width="800" />
 </p>
 
 This repository hosts the final project for the **Advanced Computer Networking** course (2025-2026) at the **University of Pisa**.
